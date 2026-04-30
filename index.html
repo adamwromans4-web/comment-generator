@@ -6,72 +6,135 @@
 <title>Comment Generator</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;padding:2rem 1rem;}
-.c{max-width:740px;margin:0 auto;}
-h1{font-size:22px;font-weight:500;margin-bottom:1.5rem;}
-input{width:100%;height:40px;padding:0 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;margin-bottom:10px;}
-input:focus{outline:none;border-color:#888;}
-select{width:100%;height:40px;padding:0 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;margin-bottom:12px;cursor:pointer;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;padding:0;}
+.header{background:#fff;border-bottom:1px solid #e5e5e3;padding:1rem 1.5rem;position:sticky;top:0;z-index:10;}
+.header-inner{max-width:740px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.header h1{font-size:18px;font-weight:500;color:#1a1a18;margin:0;}
+.header p{font-size:12px;color:#888;margin:0;}
+.main{max-width:740px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+.search-row{display:flex;gap:8px;margin-bottom:10px;}
+.search-row input{flex:1;height:40px;padding:0 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;}
+.search-row input:focus{outline:none;border-color:#888;}
+.clear-btn{height:40px;padding:0 16px;font-size:13px;font-family:inherit;border:1px solid #ccc;border-radius:8px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;}
+.clear-btn:hover{background:#f0f0ee;}
+select{width:100%;height:40px;padding:0 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;margin-bottom:14px;cursor:pointer;}
 select:focus{outline:none;border-color:#888;}
-.cnt{font-size:13px;color:#666;margin-bottom:8px;}
-.lst{display:flex;flex-direction:column;gap:8px;}
-.itm{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e5e5e3;border-radius:8px;padding:10px 14px;}
+.cat-label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:none;}
+.count-bar{font-size:13px;color:#888;margin-bottom:8px;}
+.lst{display:flex;flex-direction:column;gap:6px;}
+.itm{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e5e3;border-radius:8px;padding:9px 12px;}
+.itm:hover{border-color:#bbb;}
+.star{flex-shrink:0;width:24px;height:24px;background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:0;line-height:1;display:flex;align-items:center;justify-content:center;}
+.star.on{color:#f59e0b;}
+.star:hover{color:#f59e0b;}
 .txt{flex:1;font-size:14px;color:#1a1a18;line-height:1.5;}
-.btn{flex-shrink:0;height:30px;padding:0 14px;font-size:12px;font-family:inherit;border:1px solid #ccc;border-radius:6px;background:transparent;color:#555;cursor:pointer;}
+.btn{flex-shrink:0;height:28px;padding:0 12px;font-size:12px;font-family:inherit;border:1px solid #ccc;border-radius:6px;background:transparent;color:#555;cursor:pointer;white-space:nowrap;}
 .btn:hover{background:#f0f0ee;}
 .btn.ok{color:#2a7a4a;border-color:#2a7a4a;}
 mark{background:#fff3cd;border-radius:2px;}
-.empty{font-size:14px;color:#888;padding:1rem 0;}
+.empty{font-size:14px;color:#888;padding:8px 0;}
+.section-head{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin:16px 0 8px;display:flex;align-items:center;gap:6px;}
+.section-head span{font-weight:400;text-transform:none;font-size:11px;}
+.divider{height:1px;background:#e5e5e3;margin:16px 0;}
+.recent-itm{display:flex;align-items:center;gap:8px;background:#fafaf9;border:1px solid #e5e5e3;border-radius:8px;padding:8px 12px;cursor:pointer;}
+.recent-itm:hover{background:#f0f0ee;}
+.recent-txt{flex:1;font-size:13px;color:#555;line-height:1.5;}
+@media(max-width:500px){
+  .header-inner{flex-direction:column;align-items:flex-start;gap:2px;}
+  .main{padding:1rem 0.75rem 3rem;}
+  .txt{font-size:13px;}
+  .btn{font-size:11px;padding:0 10px;}
+}
 </style>
 </head>
 <body>
-<div class="c">
-<h1>Comment Generator</h1>
-<input type="text" id="s" placeholder="Search all comments..." oninput="ds(this.value)">
-<select id="cat" onchange="pk(this.value)">
-<option value="">— choose category —</option>
-<option value="inactive">General Inactive</option>
-<option value="active">General Active</option>
-<option value="diagnostics">General Diagnostics</option>
-<option value="specificdiag">Specific Diagnostics</option>
-<option value="bariatric">Bariatric Surgery</option>
-<option value="breast">Breast Surgery</option>
-<option value="cardiology">Cardiology</option>
-<option value="dermatology">Dermatology</option>
-<option value="ers">ERS</option>
-<option value="gastro">Gastroenterology</option>
-<option value="genmedicine">General Medicine</option>
-<option value="gynaecology">Gynaecology</option>
-<option value="omfs">Oral and Maxillofacial Surgery/Orthodontics</option>
-<option value="respiratory">Respiratory</option>
-<option value="tando">Trauma &amp; Orthopaedics</option>
-<option value="vascular_diag">Vascular Specific Diagnostics</option>
-<option value="tando_gen">General T&amp;O Procedures - TCI required</option>
-<option value="tando_upper">T&amp;O Upper Limb - TCI required</option>
-<option value="tando_spine">T&amp;O Spinal Surgery - TCI required</option>
-<option value="tando_lower">T&amp;O Lower Limb - TCI required</option>
-<option value="tando_foot">T&amp;O Foot &amp; Ankle - TCI required</option>
-<option value="tando_pod">T&amp;O/Podiatry - TCI required</option>
-<option value="tando_booked">T&amp;O Procedures - TCI booked</option>
-<option value="cardiology_proc">Cardiology Procedures - TCI required</option>
-<option value="ent">ENT Procedures - TCI required</option>
-<option value="gensurg_ugi">General Surgery/Upper GI - TCI required</option>
-<option value="gensurg_colorectal">General Colorectal Procedures - TCI required</option>
-<option value="gensurg_vasc">General Surgery/Vascular - TCI required</option>
-<option value="gensurg_bariatric">General Surgery/Bariatric - TCI required</option>
-<option value="gensurg_breast">General Surgery/Breast - TCI required</option>
-<option value="gynae_proc">Gynaecology Procedures - TCI required</option>
-<option value="omfs_proc">Oral &amp; Maxillofacial/Orthodontic Procedures - TCI required</option>
-<option value="urology">Urology Procedures - TCI required</option>
-<option value="duplicates">Duplicates</option>
-<option value="queries">Queries</option>
-<option value="cancelledopa">Cancelled OPA/TCI</option>
-<option value="dna">DNA</option>
-<option value="nonrtt">NON RTT</option>
-</select>
-<div id="cnt" class="cnt"></div>
-<div id="lst" class="lst"></div>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>Comment Generator</h1>
+      <p>Data validation comment tool</p>
+    </div>
+  </div>
 </div>
+
+<div class="main">
+
+  <div class="search-row">
+    <input type="text" id="s" placeholder="Search all comments..." oninput="ds(this.value)">
+    <button class="clear-btn" onclick="clearAll()">Clear</button>
+  </div>
+
+  <select id="cat" onchange="pk(this.value)">
+    <option value="">— choose category —</option>
+    <optgroup label="── General ──────────────────────">
+      <option value="inactive">General Inactive</option>
+      <option value="active">General Active</option>
+      <option value="diagnostics">General Diagnostics</option>
+      <option value="specificdiag">Specific Diagnostics</option>
+    </optgroup>
+    <optgroup label="── Specialties ──────────────────">
+      <option value="bariatric">Bariatric Surgery</option>
+      <option value="breast">Breast Surgery</option>
+      <option value="cardiology">Cardiology</option>
+      <option value="dermatology">Dermatology</option>
+      <option value="ers">ERS</option>
+      <option value="gastro">Gastroenterology</option>
+      <option value="genmedicine">General Medicine</option>
+      <option value="gynaecology">Gynaecology</option>
+      <option value="omfs">Oral and Maxillofacial Surgery/Orthodontics</option>
+      <option value="respiratory">Respiratory</option>
+      <option value="tando">Trauma &amp; Orthopaedics</option>
+      <option value="vascular_diag">Vascular Specific Diagnostics</option>
+    </optgroup>
+    <optgroup label="── T&amp;O Procedures ─────────────">
+      <option value="tando_gen">General T&amp;O Procedures - TCI required</option>
+      <option value="tando_upper">T&amp;O Upper Limb - TCI required</option>
+      <option value="tando_spine">T&amp;O Spinal Surgery - TCI required</option>
+      <option value="tando_lower">T&amp;O Lower Limb - TCI required</option>
+      <option value="tando_foot">T&amp;O Foot &amp; Ankle - TCI required</option>
+      <option value="tando_pod">T&amp;O/Podiatry - TCI required</option>
+      <option value="tando_booked">T&amp;O Procedures - TCI booked</option>
+    </optgroup>
+    <optgroup label="── Other Procedures ─────────────">
+      <option value="cardiology_proc">Cardiology Procedures - TCI required</option>
+      <option value="ent">ENT Procedures - TCI required</option>
+      <option value="gensurg_ugi">General Surgery/Upper GI - TCI required</option>
+      <option value="gensurg_colorectal">General Colorectal - TCI required</option>
+      <option value="gensurg_vasc">General Surgery/Vascular - TCI required</option>
+      <option value="gensurg_bariatric">General Surgery/Bariatric - TCI required</option>
+      <option value="gensurg_breast">General Surgery/Breast - TCI required</option>
+      <option value="gynae_proc">Gynaecology Procedures - TCI required</option>
+      <option value="omfs_proc">Oral &amp; Maxillofacial/Orthodontic Procedures - TCI required</option>
+      <option value="urology">Urology Procedures - TCI required</option>
+    </optgroup>
+    <optgroup label="── Admin ────────────────────────">
+      <option value="duplicates">Duplicates</option>
+      <option value="queries">Queries</option>
+      <option value="cancelledopa">Cancelled OPA/TCI</option>
+      <option value="dna">DNA</option>
+      <option value="nonrtt">NON RTT</option>
+    </optgroup>
+  </select>
+
+  <div id="recent-sec" style="display:none;">
+    <div class="section-head">Recently copied <span>— click to copy again</span></div>
+    <div id="recent-lst" class="lst"></div>
+    <div class="divider"></div>
+  </div>
+
+  <div id="fav-sec" style="display:none;">
+    <div class="section-head">Favourites <span>— your starred comments</span></div>
+    <div id="fav-lst" class="lst"></div>
+    <div class="divider"></div>
+  </div>
+
+  <div id="cat-label" class="cat-label"></div>
+  <div id="cnt" class="count-bar"></div>
+  <div id="lst" class="lst"></div>
+
+</div>
+
 <script>
 const D={
 inactive:["cerner letter for OPA confirms - PT discharge.","cerner letter confirms - PT discharge.","cerner letter for OPA confirms- PT DNA - rebook requested.","cerner letter for OPA confirms CS - FU is booked for","cerner letter for OPA confirms CS - FU OPA to be booked.","cerner letter for OPA confirms CS - FU 3/12.","cerner letter for OPA confirms CS - FU 6/12.","cerner letter for OPA confirms CS - FU 12/12.","cerner letter for OPA confirms CS - PIFU","cerner results letter confirms - PT discharge.","cerner results letter confirms CS - repeat","cerner letter for OPA confirms CS - repeat","cerner results letter confirms CS - FU is booked for","cerner results letter confirms CS - results letter required.","cerner results letter confirms CS - PIFU 6/12.","cerner discharge letter confirms CS - FU .","cerner discharge letter confirms CS - FU is booked for .","cerner discharge letter confirms CS - PT discharge.","cerner letter for OPA confirms - incorrect clock start.","cerner letter for OPA confirms - PT referred to","cerner letter confirms - PT has gone private","cerner MDT letter confirms CS - FU 3/12.","cerner MDT letter confirms - PT referred to RSH","view encounter/referral details confirms - referral no longer required."],
@@ -113,12 +176,103 @@ cancelledopa:["appt book/cancellation comment for OPA confirms -","appt book/can
 dna:["cerner letter for OPA confirms - PT DNA - rebook requested.","PT DNA OPA - 1st OPA rebooked for","appt book/DNA comment for OPA confirms -","appt book/DNA comment for OPA confirms - PT discharge.","appt book/DNA comment for OPA confirms - rebook requested."],
 nonrtt:["C2C referral to dietetics - non RTT -","A&E referral - non RTT - FU OPA to be booked.","A&E referral - non RTT - FU is booked for","A&E referral - non RTT - 1st OPA is booked for","A&E referral - non RTT - cerner letter for OPA confirms - PT discharge.","FU to emergency admission - non RTT - FU OPA to be booked.","FU to emergency admission - non RTT - FU is booked for","FU to emergency admission - non RTT - cerner letter for OPA confirms - PT discharge.","post admission FU - non RTT - cerner letter for OPA confirms - PT discharge.","AHP referral - non RTT - evolve audiology report confirms - PT discharge.","EPU clinic attendance - non RTT."]
 };
-function e(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function hl(t,q){if(!q)return e(t);return e(t).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');}
-function cp(b,t){navigator.clipboard.writeText(t).then(()=>{b.textContent='Copied';b.classList.add('ok');setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok');},1800);}).catch(()=>{b.textContent='Error';setTimeout(()=>{b.textContent='Copy';},1800);});}
-function render(a,q){const l=document.getElementById('lst'),c=document.getElementById('cnt');if(!a||!a.length){l.innerHTML='<div class="empty">No results.</div>';c.textContent='';return;}c.textContent=a.length+' comment'+(a.length!==1?'s':'');l.innerHTML=a.map(t=>'<div class="itm"><span class="txt">'+hl(t,q)+'</span><button class="btn" onclick="cp(this,'+JSON.stringify(t)+')">Copy</button></div>').join('');}
-function pk(k){document.getElementById('s').value='';if(!k){document.getElementById('lst').innerHTML='';document.getElementById('cnt').textContent='';return;}render(D[k],'');}
-function ds(v){document.getElementById('cat').value='';const q=v.trim().toLowerCase();if(!q){document.getElementById('lst').innerHTML='';document.getElementById('cnt').textContent='';return;}render([...new Set(Object.values(D).flat().filter(c=>c.toLowerCase().includes(q)))],q);}
+
+const catNames={inactive:'General Inactive',active:'General Active',diagnostics:'General Diagnostics',specificdiag:'Specific Diagnostics',bariatric:'Bariatric Surgery',breast:'Breast Surgery',cardiology:'Cardiology',dermatology:'Dermatology',ers:'ERS',gastro:'Gastroenterology',genmedicine:'General Medicine',gynaecology:'Gynaecology',omfs:'Oral and Maxillofacial Surgery/Orthodontics',respiratory:'Respiratory',tando:'Trauma & Orthopaedics',vascular_diag:'Vascular Specific Diagnostics',tando_gen:'General T&O Procedures - TCI required',tando_upper:'T&O Upper Limb - TCI required',tando_spine:'T&O Spinal Surgery - TCI required',tando_lower:'T&O Lower Limb - TCI required',tando_foot:'T&O Foot & Ankle - TCI required',tando_pod:'T&O/Podiatry - TCI required',tando_booked:'T&O Procedures - TCI booked',cardiology_proc:'Cardiology Procedures - TCI required',ent:'ENT Procedures - TCI required',gensurg_ugi:'General Surgery/Upper GI - TCI required',gensurg_colorectal:'General Colorectal - TCI required',gensurg_vasc:'General Surgery/Vascular - TCI required',gensurg_bariatric:'General Surgery/Bariatric - TCI required',gensurg_breast:'General Surgery/Breast - TCI required',gynae_proc:'Gynaecology Procedures - TCI required',omfs_proc:'Oral & Maxillofacial/Orthodontic Procedures - TCI required',urology:'Urology Procedures - TCI required',duplicates:'Duplicates',queries:'Queries',cancelledopa:'Cancelled OPA/TCI',dna:'DNA',nonrtt:'NON RTT'};
+
+let favs=JSON.parse(localStorage.getItem('cg_favs')||'[]');
+let recent=JSON.parse(localStorage.getItem('cg_recent')||'[]');
+let currentKey='';
+
+function saveFavs(){localStorage.setItem('cg_favs',JSON.stringify(favs));}
+function saveRecent(){localStorage.setItem('cg_recent',JSON.stringify(recent));}
+
+function toggleFav(t){
+  const i=favs.indexOf(t);
+  if(i>-1)favs.splice(i,1);else favs.unshift(t);
+  saveFavs();renderFavs();
+  if(currentKey)render(D[currentKey],'');
+  else if(document.getElementById('s').value)ds(document.getElementById('s').value);
+}
+
+function addRecent(t){
+  recent=[t,...recent.filter(x=>x!==t)].slice(0,5);
+  saveRecent();renderRecent();
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function hl(t,q){if(!q)return esc(t);return esc(t).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');}
+
+function cp(b,t){
+  navigator.clipboard.writeText(t).then(()=>{
+    b.textContent='Copied';b.classList.add('ok');
+    addRecent(t);
+    setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok');},1800);
+  }).catch(()=>{b.textContent='Error';setTimeout(()=>{b.textContent='Copy';},1800);});
+}
+
+function makeItem(t,q){
+  const f=favs.includes(t);
+  return `<div class="itm">
+    <button class="star${f?' on':''}" onclick="toggleFav(${JSON.stringify(t)})">${f?'★':'☆'}</button>
+    <span class="txt">${hl(t,q)}</span>
+    <button class="btn" onclick="cp(this,${JSON.stringify(t)})">Copy</button>
+  </div>`;
+}
+
+function renderFavs(){
+  const sec=document.getElementById('fav-sec'),lst=document.getElementById('fav-lst');
+  if(!favs.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  lst.innerHTML=favs.map(t=>makeItem(t,'')).join('');
+}
+
+function renderRecent(){
+  const sec=document.getElementById('recent-sec'),lst=document.getElementById('recent-lst');
+  if(!recent.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  lst.innerHTML=recent.map(t=>`<div class="recent-itm">
+    <span class="recent-txt">${esc(t)}</span>
+    <button class="btn" onclick="cp(this,${JSON.stringify(t)})">Copy</button>
+  </div>`).join('');
+}
+
+function render(a,q){
+  const l=document.getElementById('lst'),c=document.getElementById('cnt');
+  if(!a||!a.length){l.innerHTML='<div class="empty">No results found.</div>';c.textContent='';return;}
+  c.textContent=a.length+' comment'+(a.length!==1?'s':'');
+  l.innerHTML=a.map(t=>makeItem(t,q)).join('');
+}
+
+function pk(k){
+  document.getElementById('s').value='';
+  currentKey=k;
+  const lbl=document.getElementById('cat-label');
+  if(k){lbl.style.display='block';lbl.textContent=catNames[k]||k;}
+  else{lbl.style.display='none';}
+  if(!k){document.getElementById('lst').innerHTML='';document.getElementById('cnt').textContent='';return;}
+  render(D[k],'');
+}
+
+function ds(v){
+  document.getElementById('cat').value='';
+  currentKey='';
+  document.getElementById('cat-label').style.display='none';
+  const q=v.trim().toLowerCase();
+  if(!q){document.getElementById('lst').innerHTML='';document.getElementById('cnt').textContent='';return;}
+  render([...new Set(Object.values(D).flat().filter(c=>c.toLowerCase().includes(q)))],q);
+}
+
+function clearAll(){
+  document.getElementById('s').value='';
+  document.getElementById('cat').value='';
+  document.getElementById('lst').innerHTML='';
+  document.getElementById('cnt').textContent='';
+  document.getElementById('cat-label').style.display='none';
+  currentKey='';
+}
+
+renderFavs();
+renderRecent();
 </script>
 </body>
 </html>
