@@ -8,42 +8,50 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;padding:0;}
 .header{background:#fff;border-bottom:1px solid #e5e5e3;padding:1rem 1.5rem;position:sticky;top:0;z-index:10;}
-.header-inner{max-width:740px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.header-inner{max-width:740px;margin:0 auto;}
 .header h1{font-size:18px;font-weight:500;color:#1a1a18;margin:0;}
-.header p{font-size:12px;color:#888;margin:0;}
+.header p{font-size:12px;color:#888;margin:2px 0 0;}
 .main{max-width:740px;margin:0 auto;padding:1.5rem 1rem 3rem;}
 .search-row{display:flex;gap:8px;margin-bottom:10px;}
 .search-row input{flex:1;height:40px;padding:0 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;}
 .search-row input:focus{outline:none;border-color:#888;}
-.clear-btn{height:40px;padding:0 16px;font-size:13px;font-family:inherit;border:1px solid #ccc;border-radius:8px;background:#fff;color:#555;cursor:pointer;white-space:nowrap;}
+.clear-btn{height:40px;padding:0 16px;font-size:13px;font-family:inherit;border:1px solid #ccc;border-radius:8px;background:#fff;color:#555;cursor:pointer;}
 .clear-btn:hover{background:#f0f0ee;}
 select{width:100%;height:40px;padding:0 12px;border:1px solid #ccc;border-radius:8px;background:#fff;color:#1a1a18;font-size:14px;font-family:inherit;margin-bottom:14px;cursor:pointer;}
 select:focus{outline:none;border-color:#888;}
 .cat-label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;display:none;}
 .count-bar{font-size:13px;color:#888;margin-bottom:8px;}
+.tip{font-size:12px;color:#aaa;margin-bottom:12px;}
 .lst{display:flex;flex-direction:column;gap:6px;}
-.itm{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e5e3;border-radius:8px;padding:10px 14px;cursor:pointer;transition:background 0.1s,border-color 0.1s;}
+.itm{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e5e3;border-radius:8px;padding:10px 14px;cursor:pointer;}
 .itm:hover{background:#f0f8ff;border-color:#aac;}
-.itm.copied{background:#e8f5e9;border-color:#2a7a4a;}
-.star{flex-shrink:0;width:24px;height:24px;background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:0;line-height:1;display:flex;align-items:center;justify-content:center;}
+.itm.flash{background:#e8f5e9;border-color:#2a7a4a;}
+.star{flex-shrink:0;width:24px;height:24px;background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;padding:0;line-height:1;}
 .star.on{color:#f59e0b;}
 .star:hover{color:#f59e0b;}
 .txt{flex:1;font-size:14px;color:#1a1a18;line-height:1.5;}
-.copied-label{flex-shrink:0;font-size:12px;color:#2a7a4a;font-weight:500;opacity:0;transition:opacity 0.2s;}
-.copied-label.show{opacity:1;}
-.tip{font-size:12px;color:#aaa;margin-bottom:12px;}
 mark{background:#fff3cd;border-radius:2px;}
 .empty{font-size:14px;color:#888;padding:8px 0;}
 .section-head{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin:16px 0 8px;}
-.section-head span{font-weight:400;text-transform:none;font-size:11px;}
 .divider{height:1px;background:#e5e5e3;margin:16px 0;}
 .recent-itm{display:flex;align-items:center;gap:8px;background:#fafaf9;border:1px solid #e5e5e3;border-radius:8px;padding:9px 14px;cursor:pointer;}
 .recent-itm:hover{background:#f0f0ee;}
 .recent-txt{flex:1;font-size:13px;color:#555;line-height:1.5;}
+
+/* popup overlay */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:flex-start;justify-content:center;padding-top:80px;}
+.overlay.show{display:flex;}
+.popup{background:#fff;border-radius:12px;padding:1.25rem;width:90%;max-width:600px;box-shadow:0 8px 32px rgba(0,0,0,0.18);}
+.popup-title{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;}
+.popup-inst{font-size:13px;color:#2a7a4a;font-weight:500;margin-bottom:10px;}
+.popup textarea{width:100%;border:2px solid #2a7a4a;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;color:#1a1a18;resize:none;line-height:1.5;background:#f0fff4;}
+.popup-close{margin-top:10px;font-size:13px;color:#aaa;cursor:pointer;text-align:right;}
+.popup-close:hover{color:#555;}
+
 @media(max-width:500px){
-  .header-inner{flex-direction:column;align-items:flex-start;gap:2px;}
   .main{padding:1rem 0.75rem 3rem;}
   .txt{font-size:13px;}
+  .overlay{padding-top:40px;}
 }
 </style>
 </head>
@@ -51,15 +59,12 @@ mark{background:#fff3cd;border-radius:2px;}
 
 <div class="header">
   <div class="header-inner">
-    <div>
-      <h1>Comment Generator</h1>
-      <p>Data validation comment tool</p>
-    </div>
+    <h1>Comment Generator</h1>
+    <p>Data validation comment tool — click any comment to copy</p>
   </div>
 </div>
 
 <div class="main">
-
   <div class="search-row">
     <input type="text" id="s" placeholder="Search all comments..." oninput="ds(this.value)">
     <button class="clear-btn" onclick="clearAll()">Clear</button>
@@ -117,16 +122,14 @@ mark{background:#fff3cd;border-radius:2px;}
     </optgroup>
   </select>
 
-  <p class="tip">Click any comment to copy it instantly.</p>
-
   <div id="recent-sec" style="display:none;">
-    <div class="section-head">Recently copied <span>— click to copy again</span></div>
+    <div class="section-head">Recently copied</div>
     <div id="recent-lst" class="lst"></div>
     <div class="divider"></div>
   </div>
 
   <div id="fav-sec" style="display:none;">
-    <div class="section-head">Favourites <span>— click the star to save</span></div>
+    <div class="section-head">Favourites</div>
     <div id="fav-lst" class="lst"></div>
     <div class="divider"></div>
   </div>
@@ -134,7 +137,16 @@ mark{background:#fff3cd;border-radius:2px;}
   <div id="cat-label" class="cat-label"></div>
   <div id="cnt" class="count-bar"></div>
   <div id="lst" class="lst"></div>
+</div>
 
+<!-- popup -->
+<div class="overlay" id="overlay" onclick="closePopup(event)">
+  <div class="popup" onclick="event.stopPropagation()">
+    <div class="popup-title">Comment ready to copy</div>
+    <div class="popup-inst">Press Ctrl+C (or Cmd+C on Mac) then close</div>
+    <textarea id="popup-ta" rows="3" readonly></textarea>
+    <div class="popup-close" onclick="closePopup()">✕ Close</div>
+  </div>
 </div>
 
 <script>
@@ -205,26 +217,34 @@ function addRecent(t){
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function hl(t,q){if(!q)return esc(t);return esc(t).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');}
 
-function copyText(el,t){
-  const ta=document.createElement('textarea');
-  ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
-  document.body.appendChild(ta);ta.focus();ta.select();
-  try{document.execCommand('copy');}catch(e){}
-  document.body.removeChild(ta);
+function openPopup(t){
+  const ta=document.getElementById('popup-ta');
+  ta.value=t;
+  document.getElementById('overlay').classList.add('show');
+  setTimeout(()=>{ta.focus();ta.select();},50);
+  // also try clipboard silently
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(t).catch(()=>{});
+    navigator.clipboard.writeText(t).then(()=>{
+      document.querySelector('.popup-inst').textContent='Copied to clipboard! Press Ctrl+C if needed.';
+    }).catch(()=>{
+      document.querySelector('.popup-inst').textContent='Press Ctrl+C to copy, then close';
+    });
   }
-  el.classList.add('copied');
   addRecent(t);
-  setTimeout(()=>el.classList.remove('copied'),1200);
+}
+
+function closePopup(e){
+  if(!e||e.target===document.getElementById('overlay')||!e.target){
+    document.getElementById('overlay').classList.remove('show');
+    document.querySelector('.popup-inst').textContent='Press Ctrl+C (or Cmd+C on Mac) then close';
+  }
 }
 
 function makeItem(t,q){
   const f=favs.includes(t);
-  return `<div class="itm" onclick="copyText(this,${JSON.stringify(t)})">
+  return `<div class="itm" onclick="openPopup(${JSON.stringify(t)})">
     <button class="star${f?' on':''}" onclick="toggleFav(event,${JSON.stringify(t)})">${f?'★':'☆'}</button>
     <span class="txt">${hl(t,q)}</span>
-    <span class="copied-label">Copied!</span>
   </div>`;
 }
 
@@ -239,9 +259,8 @@ function renderRecent(){
   const sec=document.getElementById('recent-sec'),lst=document.getElementById('recent-lst');
   if(!recent.length){sec.style.display='none';return;}
   sec.style.display='block';
-  lst.innerHTML=recent.map(t=>`<div class="recent-itm" onclick="copyText(this,${JSON.stringify(t)})">
+  lst.innerHTML=recent.map(t=>`<div class="recent-itm" onclick="openPopup(${JSON.stringify(t)})">
     <span class="recent-txt">${esc(t)}</span>
-    <span class="copied-label">Copied!</span>
   </div>`).join('');
 }
 
