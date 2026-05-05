@@ -6,137 +6,58 @@
 <title>Comment Generator</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#f4f3f0;--surface:#fff;--border:#e2e1dd;--border-hover:#b0afa8;
-  --text:#1c1c1a;--text-dim:#6b6b65;--text-muted:#a5a59e;
-  --accent:#1d6f42;--accent-light:#eaf4ee;--star:#d97706;
-  --flash-bg:#eaf4ee;--flash-border:#1d6f42;--mark:#fef3c7;
-}
-body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body{font-family:'Segoe UI',Calibri,sans-serif;background:#f4f3f0;color:#1c1c1a;min-height:100vh;}
 
-/* ── Copy bar (sticky at top) ── */
-.copy-bar{
-  position:sticky;top:0;z-index:20;
-  background:#1d6f42;
-  padding:10px 1.25rem;
-  display:flex;align-items:center;gap:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,.15);
-}
-.copy-bar-label{
-  font-size:11px;font-weight:600;color:rgba(255,255,255,.7);
-  text-transform:uppercase;letter-spacing:.06em;
-  white-space:nowrap;flex-shrink:0;
-}
-.copy-bar input{
-  flex:1;
-  font-family:Calibri,'Segoe UI',sans-serif;font-size:14.67px;
-  padding:7px 10px;
-  border:2px solid rgba(255,255,255,.5);border-radius:6px;
-  background:rgba(255,255,255,.95);color:#1c1c1a;
-  cursor:text;
-}
-.copy-bar input:focus{outline:none;border-color:#fff;}
-.copy-bar-hint{
-  font-size:12px;color:rgba(255,255,255,.85);
-  white-space:nowrap;flex-shrink:0;
-}
-.copy-bar.ready input{border-color:#fff;background:#fff;}
+.header{background:#fff;border-bottom:1px solid #e2e1dd;padding:.9rem 1.25rem;position:sticky;top:0;z-index:10;}
+.header-inner{max-width:760px;margin:0 auto;}
+.header h1{font-size:15px;font-weight:600;}
+.header p{font-size:12px;color:#a5a59e;margin-top:2px;}
 
-/* ── Header ── */
-.header{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:.9rem 1.25rem;
-}
-.header-inner{max-width:760px;margin:0 auto;display:flex;align-items:baseline;gap:8px;}
-.header h1{font-size:15px;font-weight:600;color:var(--text);}
-.header-sub{font-size:12px;color:var(--text-muted);}
-
-/* ── Main ── */
 .main{max-width:760px;margin:0 auto;padding:1.25rem 1rem 4rem;}
 
-/* ── Controls ── */
 .search-row{display:flex;gap:7px;margin-bottom:8px;}
-.search-row input{
-  flex:1;height:38px;padding:0 12px;
-  border:1px solid var(--border);border-radius:7px;
-  background:var(--surface);color:var(--text);font-size:13.5px;font-family:inherit;
-}
-.search-row input:focus{outline:none;border-color:var(--accent);}
-.clear-btn{
-  height:38px;padding:0 14px;font-size:13px;font-family:inherit;
-  border:1px solid var(--border);border-radius:7px;
-  background:var(--surface);color:var(--text-dim);cursor:pointer;
-}
+.search-row input{flex:1;height:38px;padding:0 12px;border:1px solid #e2e1dd;border-radius:7px;background:#fff;color:#1c1c1a;font-size:14px;font-family:inherit;}
+.search-row input:focus{outline:none;border-color:#1d6f42;}
+.clear-btn{height:38px;padding:0 14px;font-size:13px;font-family:inherit;border:1px solid #e2e1dd;border-radius:7px;background:#fff;color:#6b6b65;cursor:pointer;}
 .clear-btn:hover{background:#f0efec;}
-select{
-  width:100%;height:38px;padding:0 10px;
-  border:1px solid var(--border);border-radius:7px;
-  background:var(--surface);color:var(--text);
-  font-size:13.5px;font-family:inherit;cursor:pointer;margin-bottom:14px;
-  appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a5a59e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
-}
-select:focus{outline:none;border-color:var(--accent);}
 
-/* ── Sections ── */
-.section-head{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 7px;}
-.divider{height:1px;background:var(--border);margin:14px 0;}
-.count-bar{font-size:12.5px;color:var(--text-muted);margin-bottom:7px;}
-.cat-label{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:none;}
+select{width:100%;height:38px;padding:0 10px;border:1px solid #e2e1dd;border-radius:7px;background:#fff;color:#1c1c1a;font-size:14px;font-family:inherit;cursor:pointer;margin-bottom:14px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a5a59e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+select:focus{outline:none;border-color:#1d6f42;}
 
-/* ── Items ── */
+.section-head{font-size:10.5px;font-weight:600;color:#a5a59e;text-transform:uppercase;letter-spacing:.07em;margin:14px 0 7px;}
+.divider{height:1px;background:#e2e1dd;margin:14px 0;}
+.count-bar{font-size:12px;color:#a5a59e;margin-bottom:7px;}
+.cat-label{font-size:11px;font-weight:600;color:#1d6f42;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:none;}
+
 .lst{display:flex;flex-direction:column;gap:5px;}
-.itm{
-  display:flex;align-items:flex-start;gap:8px;
-  background:var(--surface);border:1px solid var(--border);border-radius:8px;
-  padding:9px 12px;cursor:pointer;
-  transition:background .1s,border-color .1s;
-}
+
+.itm{display:flex;align-items:flex-start;gap:8px;background:#fff;border:1px solid #e2e1dd;border-radius:8px;padding:9px 12px;cursor:pointer;transition:background .1s,border-color .1s;}
 .itm:hover{background:#f0f8f4;border-color:#9ecfb3;}
-.itm.active{background:var(--flash-bg);border-color:var(--flash-border);}
-.star{
-  flex-shrink:0;width:22px;height:22px;margin-top:1px;
-  background:none;border:none;cursor:pointer;font-size:15px;
-  color:var(--text-muted);padding:0;line-height:1;transition:color .12s;
-}
-.star.on{color:var(--star);}
-.star:hover{color:var(--star);}
-.txt{
-  flex:1;font-size:14.67px;color:var(--text);line-height:1.5;
-  font-family:Calibri,'Segoe UI',sans-serif;
-}
-mark{background:var(--mark);border-radius:2px;padding:0 1px;}
-.empty{font-size:13.5px;color:var(--text-muted);padding:6px 0;}
+.itm.copied{background:#eaf4ee;border-color:#1d6f42;}
 
-.recent-itm{
-  display:flex;align-items:flex-start;gap:8px;
-  background:#faf9f6;border:1px solid var(--border);border-radius:8px;
-  padding:8px 12px;cursor:pointer;transition:background .1s;
-}
+.star{flex-shrink:0;width:22px;height:22px;margin-top:1px;background:none;border:none;cursor:pointer;font-size:15px;color:#a5a59e;padding:0;line-height:1;}
+.star.on{color:#d97706;}
+.star:hover{color:#d97706;}
+
+.txt{flex:1;font-size:14.67px;color:#1c1c1a;line-height:1.5;font-family:Calibri,'Segoe UI',sans-serif;}
+mark{background:#fef3c7;border-radius:2px;padding:0 1px;}
+.empty{font-size:13px;color:#a5a59e;padding:6px 0;}
+
+.recent-itm{display:flex;align-items:center;background:#faf9f6;border:1px solid #e2e1dd;border-radius:8px;padding:8px 12px;cursor:pointer;transition:background .1s;}
 .recent-itm:hover{background:#f0efec;}
-.recent-txt{flex:1;font-size:14.67px;color:var(--text-dim);line-height:1.5;font-family:Calibri,'Segoe UI',sans-serif;}
+.recent-txt{flex:1;font-size:14.67px;color:#6b6b65;line-height:1.5;font-family:Calibri,'Segoe UI',sans-serif;}
 
-@media(max-width:500px){
-  .copy-bar-hint{display:none;}
-  .txt,.recent-txt{font-size:13px;}
-}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:#1c1c1a;color:#fff;font-size:13px;padding:8px 18px;border-radius:20px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:99;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 
-<!-- Sticky copy bar -->
-<div class="copy-bar" id="copyBar">
-  <span class="copy-bar-label">Copy bar</span>
-  <input type="text" id="copyInput" value="← click any comment to load it here" readonly
-    onclick="this.select()" onfocus="this.select()">
-  <span class="copy-bar-hint">then press Ctrl+C</span>
-</div>
-
 <div class="header">
   <div class="header-inner">
     <h1>Comment Generator</h1>
-    <span class="header-sub">— click a comment to load it, then Ctrl+C</span>
+    <p>Click any comment to copy it</p>
   </div>
 </div>
 
@@ -198,7 +119,7 @@ mark{background:var(--mark);border-radius:2px;padding:0 1px;}
   </select>
 
   <div id="recent-sec" style="display:none;">
-    <div class="section-head">Recently loaded</div>
+    <div class="section-head">Recently copied</div>
     <div id="recent-lst" class="lst"></div>
     <div class="divider"></div>
   </div>
@@ -213,6 +134,8 @@ mark{background:var(--mark);border-radius:2px;padding:0 1px;}
   <div id="cnt" class="count-bar"></div>
   <div id="lst" class="lst"></div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const D={
@@ -248,7 +171,7 @@ gensurg_bariatric:["cerner letter for OPA confirms a DTA for Laparoscopic Roux-E
 gensurg_breast:["cerner letter for OPA confirms a DTA for Excision of breast lump - TCI required."],
 gynae_proc:["cerner letter for OPA confirms a DTA for Laparoscopic excision of endometriosis - TCI required.","cerner letter for OPA confirms a DTA for Hysterectomy - TCI required.","cerner letter for OPA confirms a DTA for posterior Bilateral salpingo-oopherectomy - TCI required.","cerner letter for OPA confirms a DTA for Laparoscopic Sacrocolpopexy with mesh - TCI required.","cerner letter for OPA confirms a DTA for Anterior and Posterior Vaginal Repair - TCI required.","cerner letter for OPA confirms a DTA for Posterior repair/Posterior colporrhaphy - TCI required.","cerner letter for OPA confirms a DTA for Unilateral ovarian cystectomy - TCI required.","cerner letter for OPA confirms a DTA for Labial Trimming /Labial reduction/Labioplasty - TCI required.","cerner letter for OPA confirms a DTA for Extracorporeal Shockwave Lithotripsy - TCI required.","cerner letter for OPA confirms a DTA for Bladder Neck Incision - TCI required.","cerner letter for OPA confirms a DTA for Introduction of Therapeutic Substance into Bladder - TCI required.","cerner letter for OPA confirms a DTA for Botox - TCI required.","cerner letter for OPA confirms a DTA for Bulkamid Periurethral Injections - TCI required.","cerner letter for OPA confirms a DTA for Hysterectomy + Anterior and Posterior Repair - TCI required.","cerner letter for OPA confirms a DTA for Hysterectomy + Anterior Repair - TCI required.","cerner letter for OPA confirms a DTA for hysterectomy + bilateral oopherectomy - TCI required.","cerner letter for OPA confirms a DTA for hysterectomy + bilateral salpingectomy - TCI required.","cerner letter for OPA confirms a DTA for Hysterectomy + endometrial polypectomy - TCI required.","cerner letter for OPA confirms a DTA for Anterior and Posterior Repair + Sacrospinous fixation - TCI required.","Total laparoscopic hysterectomy + bilateral salpingectomy","cerner letter for OPA confirms a DTA for Laparoscopy and adhesiolysis - TCI required.","cerner letter for OPA confirms a DTA for Open Sacrocolpopexy with mesh - TCI required."],
 omfs_proc:["cerner letter for OPA confirms a DTA for Extraction of multiple teeth - TCI required.","cerner letter for OPA confirms a DTA for Extraction of third molar - TCI required.","cerner letter for OPA confirms a DTA for Open Exposure of Impacted Canine Tooth - TCI required.","cerner letter for OPA confirms a DTA for Surgical Exposure and Bonding of Tooth - TCI required.","cerner letter for OPA confirms a DTA for Surgical Extraction of Impacted Tooth - TCI required.","cerner letter for OPA confirms a DTA for Surgical Exposure of Tooth - TCI required.","cerner letter for OPA confirms a DTA for Surgical Removal of Impacted Supernumerary Tooth - TCI required.","cerner letter for OPA confirms a DTA for submandibular stone removal - TCI required.","cerner letter for OPA confirms a DTA for excision of BCC - TCI required.","cerner letter for OPA confirms a DTA for Excision biopsy of skin lesion - TCI required.","cerner letter for OPA confirms a DTA for Enucleation Jaw Cyst - TCI required.","cerner letter for OPA confirms a DTA for Excision of a Sebaceous Cyst - TCI required."],
-urology:["cerner letter for OPA confirms a DTA for circumcision - TCI required.","cerner letter confirms a DTA for Flexible Ureteroscopic Stone Fragmentation - TCI required.","cerner letter for OPA confirms a DTA for Epididymal Cyst Excision - TCI required.","cerner letter for OPA confirms a DTA for Aquablation - TCI required.","cerner letter for OPA confirms a DTA for Bladder Neck Incision - TCI required.","cerner letter for OPA confirms a DTA for Cystolitholapaxy - TCI required.","cerner letter for OPA confirms a DTA for Hydrocele Repair - TCI required.","cerner letter for OPA confirms a DTA for TURP - TCI required."],
+urology:["cerner letter for OPA confirms a DTA for circumcision - TCI required.","cerner letter for OPA confirms a DTA for Epididymal Cyst Excision - TCI required.","cerner letter for OPA confirms a DTA for Aquablation - TCI required.","cerner letter for OPA confirms a DTA for Bladder Neck Incision - TCI required.","cerner letter for OPA confirms a DTA for Cystolitholapaxy - TCI required.","cerner letter for OPA confirms a DTA for Hydrocele Repair - TCI required.","cerner letter for OPA confirms a DTA for TURP - TCI required."],
 duplicates:["merged to pathway ending","PT already seen on OPA - UBRN/ERS referral removed.","PT already given an OPA on - UBRN/ERS referral removed."],
 queries:["no CL available for OPA","PT DNA OPA - no comment or clinic letter to confirm an outcome.","PT given an OPA on - still in a confirmed status - no CL available.","no referral letter available - no OPA given."],
 cancelledopa:["appt book/cancellation comment for OPA confirms -","appt book/cancellation comment for OPA confirms - appt to be made at a later date.","appt book/cancellation comment for OPA confirms - PT discharge.","appt book/cancellation comment for TCI confirms -","PT cancelled OPA - appt to be made at a later date.","trust cancelled OPA - appt to be made at a later date.","Trust cancelled OPA PT subsequently seen at RSH.","PT listed for - trust cancelled TCI - new TCI required.","PT listed for - PT cancelled TCI - new TCI required.","cerner discharge letter for TCI confirms - procedure cancelled - .","appt book/cancellation comment for TCI confirms CS - PT not fit for surgery - ."],
@@ -261,49 +184,62 @@ const catNames={inactive:'General Inactive',active:'General Active',diagnostics:
 let favs   = JSON.parse(localStorage.getItem('cg_favs')   || '[]');
 let recent = JSON.parse(localStorage.getItem('cg_recent') || '[]');
 let currentKey = '';
-let activeEl = null;
+let toastTimer;
 
 function saveFavs()   { localStorage.setItem('cg_favs',   JSON.stringify(favs)); }
 function saveRecent() { localStorage.setItem('cg_recent', JSON.stringify(recent)); }
 
-/* ── Load comment into the copy bar ── */
-function loadComment(text) {
-  const inp = document.getElementById('copyInput');
-  inp.value = text;
-  inp.select();
-  inp.focus();
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
 
-  // Highlight active item
-  if (activeEl) activeEl.classList.remove('active');
-  activeEl = document.querySelector(`.itm[data-text="${CSS.escape(text)}"]`);
-  if (activeEl) activeEl.classList.add('active');
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✓ Copied');
+    addRecent(text);
+    flashItem(text);
+  }).catch(() => {
+    showToast('Copy failed — try allowing clipboard access');
+  });
+}
 
-  // Track recent
-  recent = [text, ...recent.filter(x => x !== text)].slice(0, 5);
+function flashItem(text) {
+  document.querySelectorAll('.itm').forEach(el => {
+    if (el.dataset.text === text) {
+      el.classList.add('copied');
+      setTimeout(() => el.classList.remove('copied'), 800);
+    }
+  });
+}
+
+function addRecent(t) {
+  recent = [t, ...recent.filter(x => x !== t)].slice(0, 5);
   saveRecent();
   renderRecent();
 }
 
-/* ── Helpers ── */
+function toggleFav(e, t) {
+  e.stopPropagation();
+  const i = favs.indexOf(t);
+  if (i > -1) favs.splice(i, 1); else favs.unshift(t);
+  saveFavs(); renderFavs();
+  if (currentKey) render(D[currentKey], '');
+  else if (document.getElementById('s').value) ds(document.getElementById('s').value);
+}
+
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function hl(t, q) {
   if (!q) return esc(t);
   return esc(t).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
 }
 
-function toggleFav(e, t) {
-  e.stopPropagation();
-  const i = favs.indexOf(t);
-  if (i > -1) favs.splice(i,1); else favs.unshift(t);
-  saveFavs(); renderFavs();
-  if (currentKey) render(D[currentKey],'');
-  else if (document.getElementById('s').value) ds(document.getElementById('s').value);
-}
-
 function makeItem(t, q) {
   const f = favs.includes(t);
-  const safe = esc(t).replace(/"/g,'&quot;');
-  return `<div class="itm" data-text="${safe}" onclick="loadComment(${JSON.stringify(t)})">
+  return `<div class="itm" data-text="${esc(t).replace(/"/g,'&quot;')}" onclick="copyText(${JSON.stringify(t)})">
     <button class="star${f?' on':''}" onclick="toggleFav(event,${JSON.stringify(t)})">${f?'★':'☆'}</button>
     <span class="txt">${hl(t,q)}</span>
   </div>`;
@@ -313,14 +249,14 @@ function renderFavs() {
   const sec=document.getElementById('fav-sec'), lst=document.getElementById('fav-lst');
   if (!favs.length) { sec.style.display='none'; return; }
   sec.style.display='block';
-  lst.innerHTML = favs.map(t=>makeItem(t,'')).join('');
+  lst.innerHTML=favs.map(t=>makeItem(t,'')).join('');
 }
 
 function renderRecent() {
   const sec=document.getElementById('recent-sec'), lst=document.getElementById('recent-lst');
   if (!recent.length) { sec.style.display='none'; return; }
   sec.style.display='block';
-  lst.innerHTML = recent.map(t=>`<div class="recent-itm" onclick="loadComment(${JSON.stringify(t)})">
+  lst.innerHTML=recent.map(t=>`<div class="recent-itm" onclick="copyText(${JSON.stringify(t)})">
     <span class="recent-txt">${esc(t)}</span>
   </div>`).join('');
 }
@@ -328,8 +264,8 @@ function renderRecent() {
 function render(a, q) {
   const l=document.getElementById('lst'), c=document.getElementById('cnt');
   if (!a||!a.length) { l.innerHTML='<div class="empty">No results.</div>'; c.textContent=''; return; }
-  c.textContent = a.length+' comment'+(a.length!==1?'s':'');
-  l.innerHTML = a.map(t=>makeItem(t,q)).join('');
+  c.textContent=a.length+' comment'+(a.length!==1?'s':'');
+  l.innerHTML=a.map(t=>makeItem(t,q)).join('');
 }
 
 function pk(k) {
