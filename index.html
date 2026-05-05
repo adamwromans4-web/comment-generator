@@ -5,278 +5,200 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Comment Generator</title>
 <style>
-
 *{box-sizing:border-box;margin:0;padding:0;}
-
 :root{
-  --bg:#f4f3f0;
-  --surface:#fff;
-  --border:#e2e1dd;
-  --border-hover:#b0afa8;
-  --text:#1c1c1a;
-  --text-dim:#6b6b65;
-  --text-muted:#a5a59e;
-  --accent:#1d6f42;
-  --accent-light:#eaf4ee;
-  --accent-mid:#c3e0ce;
-  --star:#d97706;
-  --flash-bg:#eaf4ee;
-  --flash-border:#1d6f42;
-  --recent-bg:#faf9f6;
-  --mark:#fef3c7;
-  --header-h:60px;
-  --toast-bg:#1c1c1a;
+  --bg:#f4f3f0;--surface:#fff;--border:#e2e1dd;--border-hover:#b0afa8;
+  --text:#1c1c1a;--text-dim:#6b6b65;--text-muted:#a5a59e;
+  --accent:#1d6f42;--accent-light:#eaf4ee;--star:#d97706;
+  --flash-bg:#eaf4ee;--flash-border:#1d6f42;--mark:#fef3c7;
 }
+body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-body{font-family:'DM Sans','Segoe UI',Calibri,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0;}
+/* ── Copy bar (sticky at top) ── */
+.copy-bar{
+  position:sticky;top:0;z-index:20;
+  background:#1d6f42;
+  padding:10px 1.25rem;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.copy-bar-label{
+  font-size:11px;font-weight:600;color:rgba(255,255,255,.7);
+  text-transform:uppercase;letter-spacing:.06em;
+  white-space:nowrap;flex-shrink:0;
+}
+.copy-bar input{
+  flex:1;
+  font-family:Calibri,'Segoe UI',sans-serif;font-size:14.67px;
+  padding:7px 10px;
+  border:2px solid rgba(255,255,255,.5);border-radius:6px;
+  background:rgba(255,255,255,.95);color:#1c1c1a;
+  cursor:text;
+}
+.copy-bar input:focus{outline:none;border-color:#fff;}
+.copy-bar-hint{
+  font-size:12px;color:rgba(255,255,255,.85);
+  white-space:nowrap;flex-shrink:0;
+}
+.copy-bar.ready input{border-color:#fff;background:#fff;}
 
 /* ── Header ── */
 .header{
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  height:var(--header-h);
-  display:flex;align-items:center;
-  position:sticky;top:0;z-index:20;
-  padding:0 1.5rem;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:.9rem 1.25rem;
 }
-.header-inner{
-  max-width:760px;width:100%;margin:0 auto;
-  display:flex;align-items:baseline;gap:10px;
-}
-.header h1{font-size:15px;font-weight:600;letter-spacing:-0.01em;color:var(--text);}
-.header-sub{font-size:12px;color:var(--text-muted);font-weight:400;}
+.header-inner{max-width:760px;margin:0 auto;display:flex;align-items:baseline;gap:8px;}
+.header h1{font-size:15px;font-weight:600;color:var(--text);}
+.header-sub{font-size:12px;color:var(--text-muted);}
 
 /* ── Main ── */
 .main{max-width:760px;margin:0 auto;padding:1.25rem 1rem 4rem;}
 
 /* ── Controls ── */
-.controls{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
-.search-row{display:flex;gap:7px;}
+.search-row{display:flex;gap:7px;margin-bottom:8px;}
 .search-row input{
   flex:1;height:38px;padding:0 12px;
   border:1px solid var(--border);border-radius:7px;
-  background:var(--surface);color:var(--text);
-  font-size:13.5px;font-family:inherit;
-  transition:border-color .15s;
+  background:var(--surface);color:var(--text);font-size:13.5px;font-family:inherit;
 }
-.search-row input::placeholder{color:var(--text-muted);}
 .search-row input:focus{outline:none;border-color:var(--accent);}
 .clear-btn{
   height:38px;padding:0 14px;font-size:13px;font-family:inherit;
   border:1px solid var(--border);border-radius:7px;
   background:var(--surface);color:var(--text-dim);cursor:pointer;
-  white-space:nowrap;transition:background .12s,border-color .12s;
 }
-.clear-btn:hover{background:#f0efec;border-color:var(--border-hover);}
-
+.clear-btn:hover{background:#f0efec;}
 select{
   width:100%;height:38px;padding:0 10px;
   border:1px solid var(--border);border-radius:7px;
   background:var(--surface);color:var(--text);
-  font-size:13.5px;font-family:inherit;cursor:pointer;
-  transition:border-color .15s;
+  font-size:13.5px;font-family:inherit;cursor:pointer;margin-bottom:14px;
   appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a5a59e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  padding-right:32px;
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
 }
 select:focus{outline:none;border-color:var(--accent);}
 
-/* ── Section headers ── */
-.section-head{
-  font-size:10.5px;font-weight:600;color:var(--text-muted);
-  text-transform:uppercase;letter-spacing:.07em;margin:14px 0 7px;
-}
+/* ── Sections ── */
+.section-head{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 7px;}
 .divider{height:1px;background:var(--border);margin:14px 0;}
-
-/* ── Count bar ── */
 .count-bar{font-size:12.5px;color:var(--text-muted);margin-bottom:7px;}
-.cat-label{
-  font-size:11px;font-weight:600;color:var(--accent);
-  text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:none;
-}
+.cat-label{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:none;}
 
-/* ── Lists ── */
+/* ── Items ── */
 .lst{display:flex;flex-direction:column;gap:5px;}
-
 .itm{
   display:flex;align-items:flex-start;gap:8px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;padding:9px 12px;
-  cursor:pointer;
-  transition:background .12s,border-color .12s,transform .1s;
-  position:relative;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:9px 12px;cursor:pointer;
+  transition:background .1s,border-color .1s;
 }
-.itm:hover{background:#f7f6f3;border-color:var(--border-hover);}
-.itm:active{transform:scale(0.995);}
-.itm.flash{background:var(--flash-bg);border-color:var(--flash-border);}
-
+.itm:hover{background:#f0f8f4;border-color:#9ecfb3;}
+.itm.active{background:var(--flash-bg);border-color:var(--flash-border);}
 .star{
   flex-shrink:0;width:22px;height:22px;margin-top:1px;
-  background:none;border:none;cursor:pointer;
-  font-size:15px;color:var(--text-muted);padding:0;line-height:1;
-  transition:color .12s,transform .15s;
+  background:none;border:none;cursor:pointer;font-size:15px;
+  color:var(--text-muted);padding:0;line-height:1;transition:color .12s;
 }
 .star.on{color:var(--star);}
-.star:hover{color:var(--star);transform:scale(1.2);}
-
+.star:hover{color:var(--star);}
 .txt{
   flex:1;font-size:14.67px;color:var(--text);line-height:1.5;
-  font-family:Calibri,'Calibri Light','Segoe UI',sans-serif;
+  font-family:Calibri,'Segoe UI',sans-serif;
 }
 mark{background:var(--mark);border-radius:2px;padding:0 1px;}
-
-.copy-hint{
-  flex-shrink:0;margin-top:2px;
-  font-size:10.5px;color:var(--text-muted);
-  opacity:0;transition:opacity .12s;
-  white-space:nowrap;padding-top:1px;
-}
-.itm:hover .copy-hint{opacity:1;}
+.empty{font-size:13.5px;color:var(--text-muted);padding:6px 0;}
 
 .recent-itm{
   display:flex;align-items:flex-start;gap:8px;
-  background:var(--recent-bg);border:1px solid var(--border);
-  border-radius:8px;padding:8px 12px;cursor:pointer;
-  transition:background .12s;
+  background:#faf9f6;border:1px solid var(--border);border-radius:8px;
+  padding:8px 12px;cursor:pointer;transition:background .1s;
 }
 .recent-itm:hover{background:#f0efec;}
-.recent-txt{flex:1;font-size:14.67px;color:var(--text-dim);line-height:1.5;font-family:Calibri,'Calibri Light','Segoe UI',sans-serif;}
-
-.empty{font-size:13.5px;color:var(--text-muted);padding:6px 0;}
-
-/* ── Toast ── */
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);
-  background:var(--toast-bg);color:#fff;
-  font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;
-  padding:9px 18px;border-radius:24px;
-  opacity:0;transition:opacity .18s,transform .18s;
-  pointer-events:none;z-index:200;
-  white-space:nowrap;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.toast.warn{background:#92400e;}
-
-/* ── Popup overlay (fallback) ── */
-.overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.5);z-index:100;
-  align-items:flex-start;justify-content:center;
-  padding-top:70px;
-}
-.overlay.show{display:flex;}
-.popup{
-  background:var(--surface);border-radius:12px;padding:1.25rem;
-  width:92%;max-width:580px;
-  box-shadow:0 12px 40px rgba(0,0,0,.2);
-}
-.popup-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
-.popup-inst{
-  font-size:13px;color:var(--accent);font-weight:600;
-  margin-bottom:10px;padding:8px 10px;
-  background:var(--accent-light);border-radius:6px;
-  border-left:3px solid var(--accent);
-}
-.popup textarea{
-  width:100%;border:1.5px solid var(--border);border-radius:7px;
-  padding:10px 12px;font-size:13px;
-  font-family:'DM Mono',monospace;
-  color:var(--text);resize:vertical;line-height:1.55;
-  background:#fafaf8;
-}
-.popup textarea:focus{outline:none;border-color:var(--accent);}
-.popup-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
-.popup-copy-btn{
-  height:34px;padding:0 16px;font-size:13px;font-family:inherit;font-weight:500;
-  border:none;border-radius:7px;
-  background:var(--accent);color:#fff;cursor:pointer;
-  transition:background .12s;
-}
-.popup-copy-btn:hover{background:#155e38;}
-.popup-close{font-size:13px;color:var(--text-muted);cursor:pointer;}
-.popup-close:hover{color:var(--text);}
+.recent-txt{flex:1;font-size:14.67px;color:var(--text-dim);line-height:1.5;font-family:Calibri,'Segoe UI',sans-serif;}
 
 @media(max-width:500px){
-  .main{padding:1rem .75rem 3rem;}
-  .txt,.recent-txt{font-size:12px;}
-  .overlay{padding-top:36px;}
-  .copy-hint{display:none;}
+  .copy-bar-hint{display:none;}
+  .txt,.recent-txt{font-size:13px;}
 }
 </style>
 </head>
 <body>
 
+<!-- Sticky copy bar -->
+<div class="copy-bar" id="copyBar">
+  <span class="copy-bar-label">Copy bar</span>
+  <input type="text" id="copyInput" value="← click any comment to load it here" readonly
+    onclick="this.select()" onfocus="this.select()">
+  <span class="copy-bar-hint">then press Ctrl+C</span>
+</div>
+
 <div class="header">
   <div class="header-inner">
     <h1>Comment Generator</h1>
-    <span class="header-sub">— data validation tool</span>
+    <span class="header-sub">— click a comment to load it, then Ctrl+C</span>
   </div>
 </div>
 
 <div class="main">
-  <div class="controls">
-    <div class="search-row">
-      <input type="text" id="s" placeholder="Search all comments…" oninput="ds(this.value)" autocomplete="off" spellcheck="false">
-      <button class="clear-btn" onclick="clearAll()">Clear</button>
-    </div>
-    <select id="cat" onchange="pk(this.value)">
-      <option value="">— choose category —</option>
-      <optgroup label="── General ──────────────────────">
-        <option value="inactive">General Inactive</option>
-        <option value="active">General Active</option>
-        <option value="diagnostics">General Diagnostics</option>
-        <option value="specificdiag">Specific Diagnostics</option>
-      </optgroup>
-      <optgroup label="── Specialties ──────────────────">
-        <option value="bariatric">Bariatric Surgery</option>
-        <option value="breast">Breast Surgery</option>
-        <option value="cardiology">Cardiology</option>
-        <option value="dermatology">Dermatology</option>
-        <option value="ers">ERS</option>
-        <option value="gastro">Gastroenterology</option>
-        <option value="genmedicine">General Medicine</option>
-        <option value="gynaecology">Gynaecology</option>
-        <option value="omfs">Oral and Maxillofacial Surgery/Orthodontics</option>
-        <option value="respiratory">Respiratory</option>
-        <option value="tando">Trauma &amp; Orthopaedics</option>
-        <option value="vascular_diag">Vascular Specific Diagnostics</option>
-      </optgroup>
-      <optgroup label="── T&amp;O Procedures ─────────────">
-        <option value="tando_gen">General T&amp;O Procedures - TCI required</option>
-        <option value="tando_upper">T&amp;O Upper Limb - TCI required</option>
-        <option value="tando_spine">T&amp;O Spinal Surgery - TCI required</option>
-        <option value="tando_lower">T&amp;O Lower Limb - TCI required</option>
-        <option value="tando_foot">T&amp;O Foot &amp; Ankle - TCI required</option>
-        <option value="tando_pod">T&amp;O/Podiatry - TCI required</option>
-        <option value="tando_booked">T&amp;O Procedures - TCI booked</option>
-      </optgroup>
-      <optgroup label="── Other Procedures ─────────────">
-        <option value="cardiology_proc">Cardiology Procedures - TCI required</option>
-        <option value="ent">ENT Procedures - TCI required</option>
-        <option value="gensurg_ugi">General Surgery/Upper GI - TCI required</option>
-        <option value="gensurg_colorectal">General Colorectal - TCI required</option>
-        <option value="gensurg_vasc">General Surgery/Vascular - TCI required</option>
-        <option value="gensurg_bariatric">General Surgery/Bariatric - TCI required</option>
-        <option value="gensurg_breast">General Surgery/Breast - TCI required</option>
-        <option value="gynae_proc">Gynaecology Procedures - TCI required</option>
-        <option value="omfs_proc">Oral &amp; Maxillofacial/Orthodontic Procedures - TCI required</option>
-        <option value="urology">Urology Procedures - TCI required</option>
-      </optgroup>
-      <optgroup label="── Admin ────────────────────────">
-        <option value="duplicates">Duplicates</option>
-        <option value="queries">Queries</option>
-        <option value="cancelledopa">Cancelled OPA/TCI</option>
-        <option value="dna">DNA</option>
-        <option value="nonrtt">NON RTT</option>
-      </optgroup>
-    </select>
+  <div class="search-row">
+    <input type="text" id="s" placeholder="Search all comments…" oninput="ds(this.value)" autocomplete="off" spellcheck="false">
+    <button class="clear-btn" onclick="clearAll()">Clear</button>
   </div>
+  <select id="cat" onchange="pk(this.value)">
+    <option value="">— choose category —</option>
+    <optgroup label="── General ──────────────────────">
+      <option value="inactive">General Inactive</option>
+      <option value="active">General Active</option>
+      <option value="diagnostics">General Diagnostics</option>
+      <option value="specificdiag">Specific Diagnostics</option>
+    </optgroup>
+    <optgroup label="── Specialties ──────────────────">
+      <option value="bariatric">Bariatric Surgery</option>
+      <option value="breast">Breast Surgery</option>
+      <option value="cardiology">Cardiology</option>
+      <option value="dermatology">Dermatology</option>
+      <option value="ers">ERS</option>
+      <option value="gastro">Gastroenterology</option>
+      <option value="genmedicine">General Medicine</option>
+      <option value="gynaecology">Gynaecology</option>
+      <option value="omfs">Oral and Maxillofacial Surgery/Orthodontics</option>
+      <option value="respiratory">Respiratory</option>
+      <option value="tando">Trauma &amp; Orthopaedics</option>
+      <option value="vascular_diag">Vascular Specific Diagnostics</option>
+    </optgroup>
+    <optgroup label="── T&amp;O Procedures ─────────────">
+      <option value="tando_gen">General T&amp;O Procedures - TCI required</option>
+      <option value="tando_upper">T&amp;O Upper Limb - TCI required</option>
+      <option value="tando_spine">T&amp;O Spinal Surgery - TCI required</option>
+      <option value="tando_lower">T&amp;O Lower Limb - TCI required</option>
+      <option value="tando_foot">T&amp;O Foot &amp; Ankle - TCI required</option>
+      <option value="tando_pod">T&amp;O/Podiatry - TCI required</option>
+      <option value="tando_booked">T&amp;O Procedures - TCI booked</option>
+    </optgroup>
+    <optgroup label="── Other Procedures ─────────────">
+      <option value="cardiology_proc">Cardiology Procedures - TCI required</option>
+      <option value="ent">ENT Procedures - TCI required</option>
+      <option value="gensurg_ugi">General Surgery/Upper GI - TCI required</option>
+      <option value="gensurg_colorectal">General Colorectal - TCI required</option>
+      <option value="gensurg_vasc">General Surgery/Vascular - TCI required</option>
+      <option value="gensurg_bariatric">General Surgery/Bariatric - TCI required</option>
+      <option value="gensurg_breast">General Surgery/Breast - TCI required</option>
+      <option value="gynae_proc">Gynaecology Procedures - TCI required</option>
+      <option value="omfs_proc">Oral &amp; Maxillofacial/Orthodontic Procedures - TCI required</option>
+      <option value="urology">Urology Procedures - TCI required</option>
+    </optgroup>
+    <optgroup label="── Admin ────────────────────────">
+      <option value="duplicates">Duplicates</option>
+      <option value="queries">Queries</option>
+      <option value="cancelledopa">Cancelled OPA/TCI</option>
+      <option value="dna">DNA</option>
+      <option value="nonrtt">NON RTT</option>
+    </optgroup>
+  </select>
 
   <div id="recent-sec" style="display:none;">
-    <div class="section-head">Recently copied</div>
+    <div class="section-head">Recently loaded</div>
     <div id="recent-lst" class="lst"></div>
     <div class="divider"></div>
   </div>
@@ -292,24 +214,7 @@ mark{background:var(--mark);border-radius:2px;padding:0 1px;}
   <div id="lst" class="lst"></div>
 </div>
 
-<!-- Toast notification -->
-<div class="toast" id="toast"></div>
-
-<!-- Popup fallback -->
-<div class="overlay" id="overlay" onclick="closePopup(event)">
-  <div class="popup" onclick="event.stopPropagation()">
-    <div class="popup-title">Copy comment</div>
-    <div class="popup-inst" id="popup-inst">Select all the text below, then press Ctrl+C to copy</div>
-    <textarea id="popup-ta" rows="3" readonly onclick="this.select()"></textarea>
-    <div class="popup-actions">
-      <button class="popup-copy-btn" onclick="popupTryCopy()">Try copy again</button>
-      <span class="popup-close" onclick="closePopup()">✕ Close</span>
-    </div>
-  </div>
-</div>
-
 <script>
-/* ── Data ── */
 const D={
 inactive:["cerner letter for OPA confirms - PT discharge.","cerner letter confirms - PT discharge.","cerner letter for OPA confirms- PT DNA - rebook requested.","cerner letter for OPA confirms CS - FU is booked for","cerner letter for OPA confirms CS - FU OPA to be booked.","cerner letter for OPA confirms CS - FU 3/12.","cerner letter for OPA confirms CS - FU 6/12.","cerner letter for OPA confirms CS - FU 12/12.","cerner letter for OPA confirms CS - PIFU","cerner results letter confirms - PT discharge.","cerner results letter confirms CS - repeat","cerner letter for OPA confirms CS - repeat","cerner results letter confirms CS - FU is booked for","cerner results letter confirms CS - results letter required.","cerner results letter confirms CS - PIFU 6/12.","cerner discharge letter confirms CS - FU .","cerner discharge letter confirms CS - FU is booked for .","cerner discharge letter confirms CS - PT discharge.","cerner letter for OPA confirms - incorrect clock start.","cerner letter for OPA confirms - PT referred to","cerner letter confirms - PT has gone private","cerner MDT letter confirms CS - FU 3/12.","cerner MDT letter confirms - PT referred to RSH","view encounter/referral details confirms - referral no longer required."],
 active:["PT referred for - 1st OPA to be booked.","PT referred for - 1st OPA is booked for","cerner letter for OPA confirms - PT referred to","cerner results letter confirms - PT referred to - FU is booked for.","cerner letter for OPA confirms - PT to have a F2F OPA - FU to be booked.","cerner letter for OPA confirms - requested - FU OPA to be booked.","PT DNA OPA - 1st OPA rebooked for .","cerner letter for OPA confirms - MDT requested.","cerner letter for OPA confirms - treatment options discussed - FU OPA to be booked."],
@@ -353,123 +258,28 @@ nonrtt:["C2C referral to dietetics - non RTT -","A&E referral - non RTT - FU OPA
 
 const catNames={inactive:'General Inactive',active:'General Active',diagnostics:'General Diagnostics',specificdiag:'Specific Diagnostics',bariatric:'Bariatric Surgery',breast:'Breast Surgery',cardiology:'Cardiology',dermatology:'Dermatology',ers:'ERS',gastro:'Gastroenterology',genmedicine:'General Medicine',gynaecology:'Gynaecology',omfs:'Oral and Maxillofacial Surgery/Orthodontics',respiratory:'Respiratory',tando:'Trauma & Orthopaedics',vascular_diag:'Vascular Specific Diagnostics',tando_gen:'General T&O Procedures - TCI required',tando_upper:'T&O Upper Limb - TCI required',tando_spine:'T&O Spinal Surgery - TCI required',tando_lower:'T&O Lower Limb - TCI required',tando_foot:'T&O Foot & Ankle - TCI required',tando_pod:'T&O/Podiatry - TCI required',tando_booked:'T&O Procedures - TCI booked',cardiology_proc:'Cardiology Procedures - TCI required',ent:'ENT Procedures - TCI required',gensurg_ugi:'General Surgery/Upper GI - TCI required',gensurg_colorectal:'General Colorectal - TCI required',gensurg_vasc:'General Surgery/Vascular - TCI required',gensurg_bariatric:'General Surgery/Bariatric - TCI required',gensurg_breast:'General Surgery/Breast - TCI required',gynae_proc:'Gynaecology Procedures - TCI required',omfs_proc:'Oral & Maxillofacial/Orthodontic Procedures - TCI required',urology:'Urology Procedures - TCI required',duplicates:'Duplicates',queries:'Queries',cancelledopa:'Cancelled OPA/TCI',dna:'DNA',nonrtt:'NON RTT'};
 
-/* ── State ── */
 let favs   = JSON.parse(localStorage.getItem('cg_favs')   || '[]');
 let recent = JSON.parse(localStorage.getItem('cg_recent') || '[]');
 let currentKey = '';
-let toastTimer = null;
+let activeEl = null;
 
-/* ── Storage ── */
-function saveFavs()   { localStorage.setItem('cg_favs',   JSON.stringify(favs));   }
+function saveFavs()   { localStorage.setItem('cg_favs',   JSON.stringify(favs)); }
 function saveRecent() { localStorage.setItem('cg_recent', JSON.stringify(recent)); }
 
-/* ── Toast ── */
-function showToast(msg, warn) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (warn ? ' warn' : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = 'toast'; }, 2200);
-}
+/* ── Load comment into the copy bar ── */
+function loadComment(text) {
+  const inp = document.getElementById('copyInput');
+  inp.value = text;
+  inp.select();
+  inp.focus();
 
-/* ── Copy logic: 3-layer fallback ──
-   1. navigator.clipboard.writeText  (modern, may be blocked)
-   2. document.execCommand('copy')   (legacy, works in most corp browsers)
-   3. Popup with pre-selected text   (manual fallback)
-*/
-function copyText(text) {
-  // execCommand runs synchronously inside the click event — the only method
-  // that reliably works in Chrome on restricted corporate networks.
-  let copied = false;
-  try {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.cssText = 'position:fixed;top:0;left:0;width:2em;height:2em;opacity:0;border:none;outline:none;box-shadow:none;background:transparent;';
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    copied = document.execCommand('copy');
-    document.body.removeChild(ta);
-  } catch(e) { copied = false; }
+  // Highlight active item
+  if (activeEl) activeEl.classList.remove('active');
+  activeEl = document.querySelector(`.itm[data-text="${CSS.escape(text)}"]`);
+  if (activeEl) activeEl.classList.add('active');
 
-  if (copied) {
-    addRecent(text);
-    flashItem(text);
-    showToast('✓ Copied');
-  } else if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => { addRecent(text); flashItem(text); showToast('✓ Copied'); })
-      .catch(() => openPopup(text));
-  } else {
-    openPopup(text);
-  }
-}
-
-/* ── Flash item ── */
-function flashItem(text) {
-  document.querySelectorAll('.itm').forEach(el => {
-    if (el.dataset.text === text) {
-      el.classList.add('flash');
-      setTimeout(() => el.classList.remove('flash'), 700);
-    }
-  });
-}
-
-/* ── Popup ── */
-let _popupText = '';
-function openPopup(text) {
-  _popupText = text;
-  addRecent(text);
-  const ta = document.getElementById('popup-ta');
-  const inst = document.getElementById('popup-inst');
-  ta.value = text;
-  inst.textContent = 'Text is selected — press Ctrl+C to copy, then close';
-  document.getElementById('overlay').classList.add('show');
-  setTimeout(() => { ta.focus(); ta.select(); }, 60);
-}
-
-function popupTryCopy() {
-  if (execCommandCopy(_popupText)) {
-    showToast('✓ Copied to clipboard');
-    document.getElementById('popup-inst').textContent = '✓ Copied! You can close this now.';
-  } else if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(_popupText)
-      .then(() => {
-        showToast('✓ Copied to clipboard');
-        document.getElementById('popup-inst').textContent = '✓ Copied! You can close this now.';
-      })
-      .catch(() => {
-        document.getElementById('popup-inst').textContent = 'Copy blocked — select text above and press Ctrl+C';
-      });
-  } else {
-    document.getElementById('popup-ta').select();
-    document.getElementById('popup-inst').textContent = 'Select the text above and press Ctrl+C';
-  }
-}
-
-function closePopup(e) {
-  if (!e || e.target === document.getElementById('overlay') || e.type !== 'click' || !e.target.closest('.popup')) {
-    document.getElementById('overlay').classList.remove('show');
-  }
-}
-document.getElementById('overlay').addEventListener('click', function(e){
-  if (e.target === this) closePopup(e);
-});
-
-/* ── Favourites ── */
-function toggleFav(e, t) {
-  e.stopPropagation();
-  const i = favs.indexOf(t);
-  if (i > -1) favs.splice(i, 1); else favs.unshift(t);
-  saveFavs();
-  renderFavs();
-  if (currentKey) render(D[currentKey], '');
-  else if (document.getElementById('s').value) ds(document.getElementById('s').value);
-}
-
-/* ── Recent ── */
-function addRecent(t) {
-  recent = [t, ...recent.filter(x => x !== t)].slice(0, 5);
+  // Track recent
+  recent = [text, ...recent.filter(x => x !== text)].slice(0, 5);
   saveRecent();
   renderRecent();
 }
@@ -478,74 +288,77 @@ function addRecent(t) {
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function hl(t, q) {
   if (!q) return esc(t);
-  return esc(t).replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','gi'), '<mark>$1</mark>');
+  return esc(t).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
 }
 
-/* ── Render helpers ── */
+function toggleFav(e, t) {
+  e.stopPropagation();
+  const i = favs.indexOf(t);
+  if (i > -1) favs.splice(i,1); else favs.unshift(t);
+  saveFavs(); renderFavs();
+  if (currentKey) render(D[currentKey],'');
+  else if (document.getElementById('s').value) ds(document.getElementById('s').value);
+}
+
 function makeItem(t, q) {
   const f = favs.includes(t);
-  return `<div class="itm" data-text="${esc(t)}" onclick="copyText(${JSON.stringify(t)})">
-    <button class="star${f?' on':''}" title="${f?'Remove favourite':'Add favourite'}" onclick="toggleFav(event,${JSON.stringify(t)})">${f?'★':'☆'}</button>
-    <span class="txt">${hl(t, q)}</span>
-    <span class="copy-hint">click to copy</span>
+  const safe = esc(t).replace(/"/g,'&quot;');
+  return `<div class="itm" data-text="${safe}" onclick="loadComment(${JSON.stringify(t)})">
+    <button class="star${f?' on':''}" onclick="toggleFav(event,${JSON.stringify(t)})">${f?'★':'☆'}</button>
+    <span class="txt">${hl(t,q)}</span>
   </div>`;
 }
 
 function renderFavs() {
-  const sec = document.getElementById('fav-sec'), lst = document.getElementById('fav-lst');
+  const sec=document.getElementById('fav-sec'), lst=document.getElementById('fav-lst');
   if (!favs.length) { sec.style.display='none'; return; }
-  sec.style.display = 'block';
-  lst.innerHTML = favs.map(t => makeItem(t, '')).join('');
+  sec.style.display='block';
+  lst.innerHTML = favs.map(t=>makeItem(t,'')).join('');
 }
 
 function renderRecent() {
-  const sec = document.getElementById('recent-sec'), lst = document.getElementById('recent-lst');
+  const sec=document.getElementById('recent-sec'), lst=document.getElementById('recent-lst');
   if (!recent.length) { sec.style.display='none'; return; }
-  sec.style.display = 'block';
-  lst.innerHTML = recent.map(t => `<div class="recent-itm" onclick="copyText(${JSON.stringify(t)})">
+  sec.style.display='block';
+  lst.innerHTML = recent.map(t=>`<div class="recent-itm" onclick="loadComment(${JSON.stringify(t)})">
     <span class="recent-txt">${esc(t)}</span>
   </div>`).join('');
 }
 
 function render(a, q) {
-  const l = document.getElementById('lst'), c = document.getElementById('cnt');
-  if (!a || !a.length) { l.innerHTML='<div class="empty">No results found.</div>'; c.textContent=''; return; }
-  c.textContent = a.length + ' comment' + (a.length !== 1 ? 's' : '');
-  l.innerHTML = a.map(t => makeItem(t, q)).join('');
+  const l=document.getElementById('lst'), c=document.getElementById('cnt');
+  if (!a||!a.length) { l.innerHTML='<div class="empty">No results.</div>'; c.textContent=''; return; }
+  c.textContent = a.length+' comment'+(a.length!==1?'s':'');
+  l.innerHTML = a.map(t=>makeItem(t,q)).join('');
 }
 
-/* ── Category pick ── */
 function pk(k) {
-  document.getElementById('s').value = '';
-  currentKey = k;
-  const lbl = document.getElementById('cat-label');
-  if (k) { lbl.style.display='block'; lbl.textContent = catNames[k] || k; }
+  document.getElementById('s').value='';
+  currentKey=k;
+  const lbl=document.getElementById('cat-label');
+  if (k) { lbl.style.display='block'; lbl.textContent=catNames[k]||k; }
   else   { lbl.style.display='none'; }
   if (!k) { document.getElementById('lst').innerHTML=''; document.getElementById('cnt').textContent=''; return; }
-  render(D[k], '');
+  render(D[k],'');
 }
 
-/* ── Search ── */
 function ds(v) {
-  document.getElementById('cat').value = '';
-  currentKey = '';
-  document.getElementById('cat-label').style.display = 'none';
-  const q = v.trim().toLowerCase();
+  document.getElementById('cat').value=''; currentKey='';
+  document.getElementById('cat-label').style.display='none';
+  const q=v.trim().toLowerCase();
   if (!q) { document.getElementById('lst').innerHTML=''; document.getElementById('cnt').textContent=''; return; }
-  render([...new Set(Object.values(D).flat().filter(c => c.toLowerCase().includes(q)))], q);
+  render([...new Set(Object.values(D).flat().filter(c=>c.toLowerCase().includes(q)))],q);
 }
 
-/* ── Clear ── */
 function clearAll() {
-  document.getElementById('s').value = '';
-  document.getElementById('cat').value = '';
-  document.getElementById('lst').innerHTML = '';
-  document.getElementById('cnt').textContent = '';
-  document.getElementById('cat-label').style.display = 'none';
-  currentKey = '';
+  document.getElementById('s').value='';
+  document.getElementById('cat').value='';
+  document.getElementById('lst').innerHTML='';
+  document.getElementById('cnt').textContent='';
+  document.getElementById('cat-label').style.display='none';
+  currentKey='';
 }
 
-/* ── Init ── */
 renderFavs();
 renderRecent();
 </script>
