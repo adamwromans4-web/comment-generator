@@ -8,7 +8,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',Calibri,sans-serif;background:#f4f3f0;color:#1c1c1a;min-height:100vh;}
 .header{background:#fff;border-bottom:1px solid #e2e1dd;padding:.9rem 1.25rem;position:sticky;top:0;z-index:10;}
-.header-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.header-inner{max-width:760px;margin:0 auto;}
 .header h1{font-size:15px;font-weight:600;}
 .header p{font-size:12px;color:#a5a59e;margin-top:2px;}
 .main{max-width:760px;margin:0 auto;padding:1.25rem 1rem 4rem;}
@@ -36,34 +36,19 @@ mark{background:#fef3c7;border-radius:2px;padding:0 1px;}
 .recent-itm{display:flex;align-items:center;background:#faf9f6;border:1px solid #e2e1dd;border-radius:8px;padding:8px 12px;cursor:pointer;transition:background .1s;}
 .recent-itm:hover{background:#f0efec;}
 .recent-txt{flex:1;font-size:14.67px;color:#6b6b65;line-height:1.5;font-family:Calibri,'Segoe UI',sans-serif;}
-
-/* Toast */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:#1c1c1a;color:#fff;font-size:13px;padding:8px 18px;border-radius:20px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:99;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* Fallback modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal{background:#fff;border-radius:12px;padding:24px;max-width:480px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);}
-.modal h2{font-size:15px;font-weight:600;margin-bottom:8px;}
-.modal p{font-size:13px;color:#6b6b65;margin-bottom:12px;}
-.modal textarea{width:100%;height:80px;border:1px solid #e2e1dd;border-radius:7px;padding:8px 10px;font-size:14.67px;font-family:Calibri,'Segoe UI',sans-serif;resize:none;color:#1c1c1a;background:#faf9f6;}
-.modal-btns{display:flex;gap:8px;margin-top:12px;justify-content:flex-end;}
-.modal-btns button{height:36px;padding:0 16px;font-size:13px;font-family:inherit;border-radius:7px;cursor:pointer;}
-.btn-close{border:1px solid #e2e1dd;background:#fff;color:#6b6b65;}
-.btn-close:hover{background:#f0efec;}
-.btn-copy{border:none;background:#1d6f42;color:#fff;}
-.btn-copy:hover{background:#165c35;}
+#clip-ta{position:fixed;left:-9999px;top:-9999px;opacity:0;font-size:14.67px;font-family:Calibri,'Segoe UI',sans-serif;}
 </style>
 </head>
 <body>
 
+<textarea id="clip-ta" aria-hidden="true" tabindex="-1"></textarea>
+
 <div class="header">
   <div class="header-inner">
-    <div>
-      <h1>Comment Generator</h1>
-      <p>Click any comment to copy it</p>
-    </div>
+    <h1>Comment Generator</h1>
+    <p>Click any comment to copy it</p>
   </div>
 </div>
 
@@ -142,268 +127,181 @@ mark{background:#fef3c7;border-radius:2px;padding:0 1px;}
   <div id="lst" class="lst"></div>
 </div>
 
-<!-- Fallback modal (shown only if clipboard API is blocked) -->
-<div class="modal-overlay" id="modal" onclick="closeModal(event)">
-  <div class="modal">
-    <h2>Copy this comment</h2>
-    <p>Your browser blocked automatic copying. Select all the text below and press <strong>Ctrl+C</strong>.</p>
-    <textarea id="modal-txt" readonly onclick="this.select()"></textarea>
-    <div class="modal-btns">
-      <button class="btn-close" onclick="closeModalDirect()">Close</button>
-      <button class="btn-copy" onclick="modalCopy()">Try copy again</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 const D={
 inactive:["cerner letter for OPA confirms - PT discharge.","cerner letter confirms - PT discharge.","cerner letter for OPA confirms- PT DNA - rebook requested.","cerner letter for OPA confirms CS - FU is booked for","cerner letter for OPA confirms CS - FU OPA to be booked.","cerner letter for OPA confirms CS - FU 3/12.","cerner letter for OPA confirms CS - FU 6/12.","cerner letter for OPA confirms CS - FU 12/12.","cerner letter for OPA confirms CS - PIFU","cerner results letter confirms - PT discharge.","cerner results letter confirms CS - repeat","cerner letter for OPA confirms CS - repeat","cerner results letter confirms CS - FU is booked for","cerner results letter confirms CS - results letter required.","cerner results letter confirms CS - PIFU 6/12.","cerner discharge letter confirms CS - FU .","cerner discharge letter confirms CS - FU is booked for .","cerner discharge letter confirms CS - PT discharge.","cerner letter for OPA confirms - incorrect clock start.","cerner letter for OPA confirms - PT referred to","cerner letter confirms - PT has gone private","cerner MDT letter confirms CS - FU 3/12.","cerner MDT letter confirms - PT referred to RSH","view encounter/referral details confirms - referral no longer required."],
-
 active:["PT referred for - 1st OPA to be booked.","PT referred for - 1st OPA is booked for","cerner letter for OPA confirms - PT referred to","cerner results letter confirms - PT referred to - FU is booked for.","cerner letter for OPA confirms - PT to have a F2F OPA - FU to be booked.","cerner letter for OPA confirms - requested - FU OPA to be booked.","PT DNA OPA - 1st OPA rebooked for .","cerner letter for OPA confirms - MDT requested.","cerner letter for OPA confirms - treatment options discussed - FU OPA to be booked."],
-
 diagnostics:["cerner letter for OPA confirms - requested - still required.","cerner letter for OPA confirms - multiple diagnostics requested - still required.","cerner letter for OPA confirms - further diagnostics requested - still required.","cerner letter for OPA confirms - requested - completed - results letter required.","cerner letter for OPA confirms - requested - completed - FU OPA is booked for","cerner letter for OPA confirms - requested - completed - FU OPA to be booked.","cerner letter confirms diagnostics complete - results letter required.","DIT letter for OPA confirms diagnostics complete - FU is booked for ."],
-
 specificdiag:["cerner letter for OPA confirms - CT requested - still required.","cerner letter for OPA confirms - MRI requested - still required.","cerner letter for OPA confirms - US requested - still required.","cerner letter for OPA confirms - USGI requested - still required.","cerner letter for OPA confirms - EMG requested - still required.","cerner letter for OPA confirms - ECG requested - still required.","cerner letter for OPA confirms - ETT requested - still required.","cerner letter for OPA confirms - EEG requested - still required.","cerner letter for OPA confirms - CTCA requested - still required.","cerner letter for OPA confirms - Echo requested - still required.","cerner letter for OPA confirms - bone scan requested - still required.","cerner letter for OPA confirms - X-ray requested - still required.","cerner letter for OPA confirms - bicycle stress echo requested - still required.","cerner letter for OPA confirms - Holter monitor requested - still required.","cerner letter for OPA confirms - barium swallow requested - still required.","cerner letter for OPA confirms - mammogram requested - still required.","cerner letter for OPA confirms - CBCT requested - still required.","cerner letter for OPA confirms - Sleep study requested - still required.","cerner letter for OPA confirms - Fibroscan requested - still required.","cerner letter for OPA confirms - ECG + Echo requested - still required."],
-
 bariatric:["cerner letter for OPA confirms - surgical Pathway - FU OPA to be booked.","cerner letter for OPA confirms - medical Pathway - FU OPA to be booked.","cerner letter for OPA confirms - surgical Pathway - FU is booked for .","cerner letter for OPA confirms - medical Pathway - FU is booked for .","DIT letter for OPA confirms - surgical Pathway - FU OPA to be booked.","DIT letter for OPA confirms - medical Pathway - FU OPA to be booked.","DIT letter for OPA confirms - surgical Pathway - FU is booked for .","DIT letter for OPA confirms - medical Pathway - FU is booked for ."],
-
 breast:["cerner letter for OPA confirms - St Georges Genetics Service requested - FU is booked for .","cerner letter for OPA confirms - mammogram requested - still required."],
-
 cardiology:["cerner letter for OPA confirms a DTA for cardioversion - TCI required."],
-
 dermatology:["cerner photohub results letter confirms - PT to have an OPA in the skin lesion clinic - OPA to be booked","cerner letter for OPA confirms - lesion excision requested - MOPs is booked for","cerner letter for OPA confirms - punch biopsy requested - MOPs is booked for","cerner letter for OPA confirms - lesion to be curetted and cauterised - MOPs is booked for ."],
-
 ers:["CSD: - PT referred for - 1st OPA to be booked.","CSD: - ERS confirms - triage required.","ERS confirms - referral cancelled - PT has gone private.","ERS confirms - referral cancelled - referral no longer required."],
-
 gastro:["cerner OGD report confirms - diagnostic complete - results letter required.","cerner colonoscopy report confirms - diagnostic complete - results letter required.","cerner Flexible Sigmoidoscopy report confirms - diagnostic complete - results letter required."],
-
 genmedicine:["cerner letter for OPA confirms CS - PT referred to palliative care."],
-
 gynaecology:["colposcopy clinic attendance - non RTT - FU is booked for","cerner results letter confirms - PT discharge.","cerner letter for OPA confirms - further diagnostics requested - still required."],
-
 omfs:["cerner letter for OPA confirms - requested - MOPs is booked for","cerner letter for OPA confirms - CBCT requested - still required.","cerner letter for OPA confirms - CBCT requested - completed - FU is booked for .","cerner letter for OPA confirms - treatment options discussed - FU is booked for .","cerner letter for OPA confirms - PT to be seen in the Joint Orthognathic Surgery clinic - FU OPA to be booked.","cerner letter for OPA confirms - FU requested to create treatment plan - FU is booked for .","cerner letter for OPA confirms - FU requested to create treatment plan - FU OPA to be booked."],
-
 respiratory:["evolve sleep study report confirms - MDT requested.","cerner results letter confirms - PT referred to the CPAP clinic - OPA to be booked.","PT had a sleep study on OPA - results letter required."],
-
 tando:["cerner letter for OPA confirms - USGI requested - still required.","cerner letter for OPA confirms - USGI requested - completed CS - FU OPA to be booked.","cerner letter for OPA confirms - USGI requested - completed CS - FU is booked for .","cerner letter for OPA confirms - USGI requested - completed CS - PIFU 6/12.","cerner letter for OPA confirms - PT referred to the Pain Management.","cerner letter for OPA confirms - PT referred to the Spine consultant.","cerner letter for OPA confirms - PT referred to the knee surgeon."],
-
 vascular_diag:["cerner letter for OPA confirms - venous duplex requested - still required.","cerner letter for OPA confirms - BL venous duplex requested - still required.","cerner letter for OPA confirms - ABPI requested - still required.","cerner letter for OPA confirms - lymphoscintigram requested - still required.","cerner letter for OPA confirms - Arterial scan requested - still required","cerner letter for OPA confirms - US requested - still required.","cerner letter for OPA confirms - vein scan + lymphoscintigram requested - still required","cerner letter for OPA confirms - venous duplex + ABPI requested - still required.","DIT letter for OPA confirms - venous duplex requested - still required.","DIT letter for OPA confirms - BL venous duplex requested - still required.","DIT letter for OPA confirms - ABPI requested - still required.","DIT letter for OPA confirms - lymphoscintigram requested - still required.","DIT letter for OPA confirms - Arterial scan requested - still required","DIT letter for OPA confirms - vein scan + lymphoscintigram requested - still required.","DIT letter for OPA confirms - DVT + Arterial scan requested - still required","DIT letter for OPA confirms - venous duplex + ABPI requested - still required."],
-
 tando_gen:["cerner letter for OPA confirms a DTA for Intra-articular Steroid Injection - TCI required.","cerner letter for OPA confirms a DTA for Injection into joint - TCI required.","cerner letter for OPA confirms a DTA for Ganglion excision - TCI required.","cerner letter for OPA confirms a DTA for bone excision - TCI required.","cerner letter for OPA confirms a DTA for excision of lipoma - TCI required.","cerner letter for OPA confirms a DTA for excision of ingrowing toenail - TCI required.","cerner letter for OPA confirms a DTA for Excision of Lump/Lesion - TCI required.","cerner letter for OPA confirms a DTA for Excision/biopsy of lesion - TCI required.","cerner letter for OPA confirms a DTA for excision of a soft tissue lesion - TCI required.","cerner letter for OPA confirms a DTA for Arthroscopic decompression/ACJ excision - TCI required.","cerner letter for OPA confirms a DTA for Scar Revision - TCI required.","cerner letter for OPA confirms a DTA for Selective denervation of peripheral nerve - TCI required.","cerner letter for OPA confirms a DTA for Tendon transfer - TCI required.","cerner letter for OPA confirms a DTA for Ligament reconstruction - TCI required.","cerner letter for OPA confirms a DTA for Fusion of first metatarsophalangeal joint nec - TCI required.","cerner letter for OPA confirms a DTA for Nerve Root Block - TCI required.","cerner letter for OPA confirms a DTA for Metalwork removal - TCI required.","cerner letter for OPA confirms a DTA for PRP Injection - TCI required."],
-
 tando_upper:["cerner letter for OPA confirms a DTA for Shoulder replacement - TCI required.","cerner letter for OPA confirms a DTA for shoulder stabilisation - TCI required.","cerner letter for OPA confirms a DTA for Arthroscopic cuff repair - TCI required.","cerner letter for OPA confirms a DTA for Rotator Cuff Repair of the Shoulder - TCI required.","cerner letter for OPA confirms a DTA for Arthroscopic Capsular Release of Shoulder - TCI required.","cerner letter for OPA confirms a DTA for Carpal tunnel decompression - TCI required.","cerner letter for OPA confirms a DTA for Trigger finger release - TCI required.","cerner letter for OPA confirms a DTA for Trigger thumb release - TCI required.","cerner letter for OPA confirms a DTA for Arthroscopy of the wrist - TCI required.","cerner letter for OPA confirms a DTA for Dupuytren's fasciectomy - TCI required.","cerner letter for OPA confirms a DTA for Latarjet procedure/open stabilisation - TCI required.","cerner letter for OPA confirms a DTA for Cubital tunnel/Ulna nerve release - TCI required.","cerner letter for OPA confirms a DTA for Distal biceps/triceps repair - TCI required.","cerner letter for OPA confirms a DTA for Arthroscopic decompression/ACJ excision - TCI required.","cerner letter for OPA confirms a DTA for ACJ reconstruction - TCI required.","cerner letter for OPA confirms a DTA for First CMCJR - TCI required.","cerner letter for OPA confirms a DTA for Tennis/golfers elbow prp injection - TCI required."],
-
 tando_spine:["cerner letter for OPA confirms a DTA for Lumbar decompression - TCI required.","cerner letter for OPA confirms a DTA for Transforaminal Epidural Steroid Injection - TCI required.","cerner letter for OPA confirms a DTA for Caudal Epidural - TCI required."],
-
 tando_lower:["cerner letter for OPA confirms a DTA for Hip replacement - TCI required.","cerner letter for OPA confirms a DTA for Hip arthroscopy - TCI required.","cerner letter for OPA confirms a DTA for Hip injection and EUA - TCI required.","cerner letter for OPA confirms a DTA for Knee replacement - TCI required.","cerner letter for OPA confirms a DTA for Revision Knee replacement - TCI required.","cerner letter for OPA confirms a DTA for Arthroscopy of the knee - TCI required.","cerner letter for OPA confirms a DTA for Knee arthroscopic medial meniscectomy - TCI required.","cerner letter for OPA confirms a DTA for Knee arthroscopic chondroplasty - TCI required.","cerner letter for OPA confirms a DTA for Arthroscopic meniscal repair - TCI required.","cerner letter for OPA confirms a DTA for Knee Aspiration of the knee joint - TCI required.","cerner letter for OPA confirms a DTA for ACL reconstruction - TCI required.","cerner letter for OPA confirms a DTA for Patella stabilisation - TCI required."],
-
 tando_foot:["cerner letter for OPA confirms a DTA for Ankle arthroscopy - TCI required.","cerner letter for OPA confirms a DTA for Ankle fusion - TCI required.","cerner letter for OPA confirms a DTA for scarf & Akin osteotomy - TCI required.","cerner letter for OPA confirms a DTA for 1st MTPJ fusion - TCI required.","cerner letter for OPA confirms a DTA for 1st MTPJ Cheilectomy - TCI required.","cerner letter for OPA confirms a DTA for Fusion of first metatarsophalangeal joint nec - TCI required.","cerner letter for OPA confirms a DTA for Lesser metatarsal osteotomy - TCI required.","cerner letter for confirms a DTA for Weil's osteotomy - TCI required.","cerner letter for OPA confirms a DTA for Exostectomy - TCI required.","cerner letter for OPA confirms a DTA for Gastrocnemius release Proximal - TCI required.","cerner letter for OPA confirms a DTA for tarsometatarsal joint fusion - TCI required.","cerner letter for OPA confirms a DTA for Multiple procedures to forefoot - TCI required.","cerner letter for OPA confirms a DTA for excision of ingrowing toenail - TCI required.","cerner letter for OPA confirms a DTA for PIPJ toe fusion - TCI required."],
-
 tando_pod:["cerner letter for OPA confirms a DTA for Lapidus +/- Akin procedure - TCI required.","cerner letter for OPA confirms a DTA for Osteotomy - TCI required.","cerner letter for OPA confirms a DTA for Nail avulsion/ablation - TCI required.","cerner letter for OPA confirms a DTA for Toe deformity correction - TCI required.","cerner letter for OPA confirms a DTA for PIP / DIP Excision arthroplasty - TCI required.","cerner letter for OPA confirms a DTA for Fusion of first metatarsophalangeal joint nec - TCI required."],
-
 tando_booked:["PT listed for Rotator Cuff Repair of the Shoulder - TCI is booked for .","PT listed for Arthroscopic cuff repair - TCI is booked for .","PT listed for Carpal tunnel decompression - TCI is booked for .","PT listed for Arthroscopic decompression/ACJ excision - TCI is booked for .","PT listed for Hip replacement - TCI is booked for .","PT listed for Arthroscopy of the knee - TCI is booked for .","PT listed for Transforaminal Epidural Steroid Injection - TCI is booked for .","PT listed for Nerve Root Block - TCI is booked for .","PT listed for DIPJ toe fusion - TCI is booked for .","PT listed for PIP / DIP Excision arthroplasty - TCI is booked for .","PT listed for Scarf & Akin osteotomy - TCI is booked for ."],
-
 cardiology_proc:["cerner letter for OPA confirms a DTA for Cardioversion - TCI required.","cerner letter for OPA confirms a DTA for Atrial Flutter Ablation - TCI required.","cerner letter for OPA confirms a DTA for Coronary Angiogram - TCI required.","cerner letter for OPA confirms a DTA for PCI - TCI required.","cerner letter for OPA confirms a DTA for EP Study and Ablation of SVT with Cryotherapy - TCI required."],
-
 ent:["cerner letter for OPA confirms a DTA for Tonsillectomy - TCI required.","cerner letter for OPA confirms a DTA for Rhinoplasty - TCI required.","cerner letter for OPA confirms a DTA for Pinnaplasty - TCI required.","cerner letter for OPA confirms a DTA for Septoplasty of Nose - TCI required.","cerner letter for OPA confirms a DTA for Total adenoidectomy - TCI required.","cerner letter for OPA confirms a DTA for hemithyroidectomy - TCI required.","cerner letter for OPA confirms a DTA for Functional Endoscopic Sinus Surgery - TCI required.","cerner letter for OPA confirms a DTA for parathyroidectomy - TCI required.","cerner letter for OPA confirms a DTA for Cauterisation of internal nose - TCI required.","cerner letter for OPA confirms a DTA for Closure of branchial fistula - TCI required.","cerner letter for OPA confirms a DTA for Septal reconstruction with cartilage graft - TCI required.","cerner letter for OPA confirms a DTA for Insertion of Ventilation Tube Through Tympanic Membrane - TCI required.","cerner letter for OPA confirms a DTA for Extracapsular dissection of Parotid tumour - TCI required.","cerner letter confirms a DTA for Excisional biopsy of tonsil lesion - TCI required.","cerner letter for OPA confirms a DTA for Grommet Insertion - TCI required.","cerner letter for OPA confirms a DTA for Surgical outfracture of turbinate of nose - TCI required.","cerner letter for OPA confirms a DTA for Bilateral dissection tonsillectomy - TCI required.","cerner letter for OPA confirms a DTA for Parathyroidectomy - TCI required.","cerner letter for OPA confirms a DTA for Myringoplasty using graft - TCI required.","cerner letter for OPA confirms a DTA for Excision of Lesion of External Ear - TCI required.","cerner letter for OPA confirms a DTA for Excision of a sebaceous cyst - TCI required."],
-
 gensurg_ugi:["cerner letter for OPA confirms a DTA for Hernia repair - TCI required.","cerner letter for OPA confirms a DTA for Cholecystectomy - TCI required.","cerner letter for OPA confirms a DTA for Antireflux fundoplication using abdominal approach - TCI required.","cerner letter for OPA confirms a DTA for Cholecystectomy +/- Cholangiogram - TCI required.","PT listed for OGD - TCI is booked for ."],
-
 gensurg_colorectal:["cerner letter for OPA confirms a DTA for Abdominoperineal Excision of Rectum and Anus - TCI required.","cerner letter for OPA confirms a DTA for Delorme's Procedure - TCI required."],
-
 gensurg_vasc:["cerner letter for OPA confirms a DTA for Varicose vein operation - TCI required.","cerner letter for OPA confirms a DTA for VNUS - Endovenous Radiofrequency Ablation - TCI required."],
-
 gensurg_bariatric:["cerner letter for OPA confirms a DTA for Laparoscopic Roux-En-Y Gastric Bypass - TCI required.","cerner letter for OPA confirms a DTA for Conversion of sleeve gastrectomy to gastric bypass - TCI required."],
-
 gensurg_breast:["cerner letter for OPA confirms a DTA for Excision of breast lump - TCI required."],
-
 gynae_proc:["cerner letter for OPA confirms a DTA for Laparoscopic excision of endometriosis - TCI required.","cerner letter for OPA confirms a DTA for Hysterectomy - TCI required.","cerner letter for OPA confirms a DTA for posterior Bilateral salpingo-oopherectomy - TCI required.","cerner letter for OPA confirms a DTA for Laparoscopic Sacrocolpopexy with mesh - TCI required.","cerner letter for OPA confirms a DTA for Anterior and Posterior Vaginal Repair - TCI required.","cerner letter for OPA confirms a DTA for Posterior repair/Posterior colporrhaphy - TCI required.","cerner letter for OPA confirms a DTA for Unilateral ovarian cystectomy - TCI required.","cerner letter for OPA confirms a DTA for Labial Trimming /Labial reduction/Labioplasty - TCI required.","cerner letter for OPA confirms a DTA for Extracorporeal Shockwave Lithotripsy - TCI required.","cerner letter for OPA confirms a DTA for Bladder Neck Incision - TCI required.","cerner letter for OPA confirms a DTA for Introduction of Therapeutic Substance into Bladder - TCI required.","cerner letter for OPA confirms a DTA for Botox - TCI required.","cerner letter for OPA confirms a DTA for Bulkamid Periurethral Injections - TCI required.","cerner letter for OPA confirms a DTA for Hysterectomy + Anterior and Posterior Repair - TCI required.","cerner letter for OPA confirms a DTA for Hysterectomy + Anterior Repair - TCI required.","cerner letter for OPA confirms a DTA for hysterectomy + bilateral oopherectomy - TCI required.","cerner letter for OPA confirms a DTA for hysterectomy + bilateral salpingectomy - TCI required.","cerner letter for OPA confirms a DTA for Hysterectomy + endometrial polypectomy - TCI required.","cerner letter for OPA confirms a DTA for Anterior and Posterior Repair + Sacrospinous fixation - TCI required.","Total laparoscopic hysterectomy + bilateral salpingectomy","cerner letter for OPA confirms a DTA for Laparoscopy and adhesiolysis - TCI required.","cerner letter for OPA confirms a DTA for Open Sacrocolpopexy with mesh - TCI required."],
-
 omfs_proc:["cerner letter for OPA confirms a DTA for Extraction of multiple teeth - TCI required.","cerner letter for OPA confirms a DTA for Extraction of third molar - TCI required.","cerner letter for OPA confirms a DTA for Open Exposure of Impacted Canine Tooth - TCI required.","cerner letter for OPA confirms a DTA for Surgical Exposure and Bonding of Tooth - TCI required.","cerner letter for OPA confirms a DTA for Surgical Extraction of Impacted Tooth - TCI required.","cerner letter for OPA confirms a DTA for Surgical Exposure of Tooth - TCI required.","cerner letter for OPA confirms a DTA for Surgical Removal of Impacted Supernumerary Tooth - TCI required.","cerner letter for OPA confirms a DTA for submandibular stone removal - TCI required.","cerner letter for OPA confirms a DTA for excision of BCC - TCI required.","cerner letter for OPA confirms a DTA for Excision biopsy of skin lesion - TCI required.","cerner letter for OPA confirms a DTA for Enucleation Jaw Cyst - TCI required.","cerner letter for OPA confirms a DTA for Excision of a Sebaceous Cyst - TCI required."],
-
 urology:["cerner letter for OPA confirms a DTA for circumcision - TCI required.","cerner letter for OPA confirms a DTA for Epididymal Cyst Excision - TCI required.","cerner letter for OPA confirms a DTA for Aquablation - TCI required.","cerner letter for OPA confirms a DTA for Bladder Neck Incision - TCI required.","cerner letter for OPA confirms a DTA for Cystolitholapaxy - TCI required.","cerner letter for OPA confirms a DTA for Hydrocele Repair - TCI required.","cerner letter for OPA confirms a DTA for TURP - TCI required."],
-
 duplicates:["merged to pathway ending","PT already seen on OPA - UBRN/ERS referral removed.","PT already given an OPA on - UBRN/ERS referral removed."],
-
 queries:["no CL available for OPA","PT DNA OPA - no comment or clinic letter to confirm an outcome.","PT given an OPA on - still in a confirmed status - no CL available.","no referral letter available - no OPA given."],
-
 cancelledopa:["appt book/cancellation comment for OPA confirms -","appt book/cancellation comment for OPA confirms - appt to be made at a later date.","appt book/cancellation comment for OPA confirms - PT discharge.","appt book/cancellation comment for TCI confirms -","PT cancelled OPA - appt to be made at a later date.","trust cancelled OPA - appt to be made at a later date.","Trust cancelled OPA PT subsequently seen at RSH.","PT listed for - trust cancelled TCI - new TCI required.","PT listed for - PT cancelled TCI - new TCI required.","cerner discharge letter for TCI confirms - procedure cancelled - .","appt book/cancellation comment for TCI confirms CS - PT not fit for surgery - ."],
-
 dna:["cerner letter for OPA confirms - PT DNA - rebook requested.","PT DNA OPA - 1st OPA rebooked for","appt book/DNA comment for OPA confirms -","appt book/DNA comment for OPA confirms - PT discharge.","appt book/DNA comment for OPA confirms - rebook requested."],
-
 nonrtt:["C2C referral to dietetics - non RTT -","A&E referral - non RTT - FU OPA to be booked.","A&E referral - non RTT - FU is booked for","A&E referral - non RTT - 1st OPA is booked for","A&E referral - non RTT - cerner letter for OPA confirms - PT discharge.","FU to emergency admission - non RTT - FU OPA to be booked.","FU to emergency admission - non RTT - FU is booked for","FU to emergency admission - non RTT - cerner letter for OPA confirms - PT discharge.","post admission FU - non RTT - cerner letter for OPA confirms - PT discharge.","AHP referral - non RTT - evolve audiology report confirms - PT discharge.","EPU clinic attendance - non RTT."]
 };
 
 const catNames={inactive:'General Inactive',active:'General Active',diagnostics:'General Diagnostics',specificdiag:'Specific Diagnostics',bariatric:'Bariatric Surgery',breast:'Breast Surgery',cardiology:'Cardiology',dermatology:'Dermatology',ers:'ERS',gastro:'Gastroenterology',genmedicine:'General Medicine',gynaecology:'Gynaecology',omfs:'Oral and Maxillofacial Surgery/Orthodontics',respiratory:'Respiratory',tando:'Trauma & Orthopaedics',vascular_diag:'Vascular Specific Diagnostics',tando_gen:'General T&O Procedures - TCI required',tando_upper:'T&O Upper Limb - TCI required',tando_spine:'T&O Spinal Surgery - TCI required',tando_lower:'T&O Lower Limb - TCI required',tando_foot:'T&O Foot & Ankle - TCI required',tando_pod:'T&O/Podiatry - TCI required',tando_booked:'T&O Procedures - TCI booked',cardiology_proc:'Cardiology Procedures - TCI required',ent:'ENT Procedures - TCI required',gensurg_ugi:'General Surgery/Upper GI - TCI required',gensurg_colorectal:'General Colorectal - TCI required',gensurg_vasc:'General Surgery/Vascular - TCI required',gensurg_bariatric:'General Surgery/Bariatric - TCI required',gensurg_breast:'General Surgery/Breast - TCI required',gynae_proc:'Gynaecology Procedures - TCI required',omfs_proc:'Oral & Maxillofacial/Orthodontic Procedures - TCI required',urology:'Urology Procedures - TCI required',duplicates:'Duplicates',queries:'Queries',cancelledopa:'Cancelled OPA/TCI',dna:'DNA',nonrtt:'NON RTT'};
 
-let favs = JSON.parse(localStorage.getItem('cg_favs') || '[]');
-let recent = JSON.parse(localStorage.getItem('cg_recent') || '[]');
-let currentKey = '';
+let favs=JSON.parse(localStorage.getItem('cg_favs')||'[]');
+let recent=JSON.parse(localStorage.getItem('cg_recent')||'[]');
+let currentKey='';
 let toastTimer;
-let pendingModalText = '';
 
-function saveFavs(){ localStorage.setItem('cg_favs', JSON.stringify(favs)); }
-function saveRecent(){ localStorage.setItem('cg_recent', JSON.stringify(recent)); }
+function saveFavs(){localStorage.setItem('cg_favs',JSON.stringify(favs));}
+function saveRecent(){localStorage.setItem('cg_recent',JSON.stringify(recent));}
 
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
+function showToast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=err?'#c0392b':'#1c1c1a';
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
 }
 
 function copyText(text){
-  if(navigator.clipboard && window.isSecureContext){
-    navigator.clipboard.writeText(text).then(() => {
+  // Method 1: execCommand — no clipboard permission needed, works everywhere
+  const ta=document.getElementById('clip-ta');
+  ta.value=text;
+  ta.focus();
+  ta.select();
+  let ok=false;
+  try{ok=document.execCommand('copy');}catch(e){}
+  if(ok){
+    showToast('✓ Copied');
+    addRecent(text);
+    flashItem(text);
+    return;
+  }
+  // Method 2: navigator.clipboard (modern browsers, HTTPS)
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>{
       showToast('✓ Copied');
       addRecent(text);
       flashItem(text);
-    }).catch(() => {
-      openModal(text);
-    });
+    }).catch(()=>showToast('Clipboard blocked — check browser permissions',true));
   } else {
-    // Older browser / non-HTTPS fallback
-    openModal(text);
-  }
-}
-
-function openModal(text){
-  pendingModalText = text;
-  const ta = document.getElementById('modal-txt');
-  ta.value = text;
-  document.getElementById('modal').classList.add('open');
-  setTimeout(() => { ta.focus(); ta.select(); }, 50);
-}
-
-function closeModal(e){
-  if(e.target === document.getElementById('modal')) closeModalDirect();
-}
-
-function closeModalDirect(){
-  document.getElementById('modal').classList.remove('open');
-}
-
-function modalCopy(){
-  const ta = document.getElementById('modal-txt');
-  ta.select();
-  if(navigator.clipboard && window.isSecureContext){
-    navigator.clipboard.writeText(pendingModalText).then(() => {
-      closeModalDirect();
-      showToast('✓ Copied');
-      addRecent(pendingModalText);
-      flashItem(pendingModalText);
-    }).catch(() => {
-      showToast('Press Ctrl+C to copy');
-    });
-  } else {
-    try {
-      document.execCommand('copy');
-      closeModalDirect();
-      showToast('✓ Copied');
-      addRecent(pendingModalText);
-      flashItem(pendingModalText);
-    } catch(e){
-      showToast('Press Ctrl+C to copy');
-    }
+    showToast('Copy unavailable — try a different browser',true);
   }
 }
 
 function flashItem(text){
-  document.querySelectorAll('.itm').forEach(el => {
-    if(el.dataset.text === text){
+  document.querySelectorAll('.itm').forEach(el=>{
+    if(el.dataset.text===text){
       el.classList.add('copied');
-      setTimeout(() => el.classList.remove('copied'), 800);
+      setTimeout(()=>el.classList.remove('copied'),800);
     }
   });
 }
 
 function addRecent(t){
-  recent = [t, ...recent.filter(x => x !== t)].slice(0,5);
+  recent=[t,...recent.filter(x=>x!==t)].slice(0,5);
   saveRecent();
   renderRecent();
 }
 
-function toggleFav(e, t){
+function toggleFav(e,t){
   e.stopPropagation();
-  const i = favs.indexOf(t);
-  if(i > -1) favs.splice(i,1); else favs.unshift(t);
-  saveFavs(); renderFavs();
-  if(currentKey) render(D[currentKey], '');
-  else if(document.getElementById('s').value) ds(document.getElementById('s').value);
+  const i=favs.indexOf(t);
+  if(i>-1)favs.splice(i,1);else favs.unshift(t);
+  saveFavs();renderFavs();
+  if(currentKey)render(D[currentKey],'');
+  else if(document.getElementById('s').value)ds(document.getElementById('s').value);
 }
 
-function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function hl(t, q){
-  if(!q) return esc(t);
+function hl(t,q){
+  if(!q)return esc(t);
   return esc(t).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
 }
 
-function makeItem(t, q){
-  const f = favs.includes(t);
+function makeItem(t,q){
+  const f=favs.includes(t);
   return `<div class="itm" data-text="${esc(t).replace(/"/g,'&quot;')}" onclick="copyText(${JSON.stringify(t)})">
-    <button class="star${f?' on':''}" onclick="toggleFav(event,${JSON.stringify(t)})" title="${f?'Remove favourite':'Add favourite'}">${f?'★':'☆'}</button>
-    <span class="txt">${hl(t,q)}</span>
-  </div>`;
+<button class="star${f?' on':''}" onclick="toggleFav(event,${JSON.stringify(t)})">${f?'★':'☆'}</button>
+<span class="txt">${hl(t,q)}</span>
+</div>`;
 }
 
 function renderFavs(){
-  const sec = document.getElementById('fav-sec'), lst = document.getElementById('fav-lst');
-  if(!favs.length){ sec.style.display='none'; return; }
+  const sec=document.getElementById('fav-sec'),lst=document.getElementById('fav-lst');
+  if(!favs.length){sec.style.display='none';return;}
   sec.style.display='block';
-  lst.innerHTML = favs.map(t => makeItem(t,'')).join('');
+  lst.innerHTML=favs.map(t=>makeItem(t,'')).join('');
 }
 
 function renderRecent(){
-  const sec = document.getElementById('recent-sec'), lst = document.getElementById('recent-lst');
-  if(!recent.length){ sec.style.display='none'; return; }
+  const sec=document.getElementById('recent-sec'),lst=document.getElementById('recent-lst');
+  if(!recent.length){sec.style.display='none';return;}
   sec.style.display='block';
-  lst.innerHTML = recent.map(t => `<div class="recent-itm" onclick="copyText(${JSON.stringify(t)})">
-    <span class="recent-txt">${esc(t)}</span>
-  </div>`).join('');
+  lst.innerHTML=recent.map(t=>`<div class="recent-itm" onclick="copyText(${JSON.stringify(t)})"><span class="recent-txt">${esc(t)}</span></div>`).join('');
 }
 
-function render(a, q){
-  const l = document.getElementById('lst'), c = document.getElementById('cnt');
-  if(!a || !a.length){ l.innerHTML='<div class="empty">No results.</div>'; c.textContent=''; return; }
-  c.textContent = a.length + ' comment' + (a.length !== 1 ? 's' : '');
-  l.innerHTML = a.map(t => makeItem(t,q)).join('');
+function render(a,q){
+  const l=document.getElementById('lst'),c=document.getElementById('cnt');
+  if(!a||!a.length){l.innerHTML='<div class="empty">No results.</div>';c.textContent='';return;}
+  c.textContent=a.length+' comment'+(a.length!==1?'s':'');
+  l.innerHTML=a.map(t=>makeItem(t,q)).join('');
 }
 
 function pk(k){
-  document.getElementById('s').value = '';
-  currentKey = k;
-  const lbl = document.getElementById('cat-label');
-  if(k){ lbl.style.display='block'; lbl.textContent = catNames[k] || k; }
-  else { lbl.style.display='none'; }
-  if(!k){ document.getElementById('lst').innerHTML=''; document.getElementById('cnt').textContent=''; return; }
-  render(D[k], '');
+  document.getElementById('s').value='';
+  currentKey=k;
+  const lbl=document.getElementById('cat-label');
+  if(k){lbl.style.display='block';lbl.textContent=catNames[k]||k;}
+  else{lbl.style.display='none';}
+  if(!k){document.getElementById('lst').innerHTML='';document.getElementById('cnt').textContent='';return;}
+  render(D[k],'');
 }
 
 function ds(v){
-  document.getElementById('cat').value = ''; currentKey = '';
-  document.getElementById('cat-label').style.display = 'none';
-  const q = v.trim().toLowerCase();
-  if(!q){ document.getElementById('lst').innerHTML=''; document.getElementById('cnt').textContent=''; return; }
-  render([...new Set(Object.values(D).flat().filter(c => c.toLowerCase().includes(q)))], q);
+  document.getElementById('cat').value='';currentKey='';
+  document.getElementById('cat-label').style.display='none';
+  const q=v.trim().toLowerCase();
+  if(!q){document.getElementById('lst').innerHTML='';document.getElementById('cnt').textContent='';return;}
+  render([...new Set(Object.values(D).flat().filter(c=>c.toLowerCase().includes(q)))],q);
 }
 
 function clearAll(){
-  document.getElementById('s').value = '';
-  document.getElementById('cat').value = '';
-  document.getElementById('lst').innerHTML = '';
-  document.getElementById('cnt').textContent = '';
-  document.getElementById('cat-label').style.display = 'none';
-  currentKey = '';
+  document.getElementById('s').value='';
+  document.getElementById('cat').value='';
+  document.getElementById('lst').innerHTML='';
+  document.getElementById('cnt').textContent='';
+  document.getElementById('cat-label').style.display='none';
+  currentKey='';
 }
-
-// Close modal on Escape key
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') closeModalDirect();
-});
 
 renderFavs();
 renderRecent();
