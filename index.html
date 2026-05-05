@@ -378,38 +378,30 @@ function showToast(msg, warn) {
    3. Popup with pre-selected text   (manual fallback)
 */
 function copyText(text) {
-  // Always open popup immediately — guaranteed fallback on any restricted network
-  openPopup(text);
-
-  // Silently attempt clipboard in background; update popup message if it works
-  setTimeout(() => {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text)
-        .then(() => {
-          document.getElementById('popup-inst').textContent = '✓ Copied to clipboard automatically — you can close this.';
-          showToast('✓ Copied to clipboard');
-          flashItem(text);
-        })
-        .catch(() => { execCommandCopy(text); });
-    } else {
-      execCommandCopy(text);
-    }
-  }, 80);
-}
-
-function execCommandCopy(text) {
+  // execCommand runs synchronously inside the click event — the only method
+  // that reliably works in Chrome on restricted corporate networks.
+  let copied = false;
   try {
     const ta = document.createElement('textarea');
     ta.value = text;
-    ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:2em;height:2em;opacity:0;border:none;outline:none;box-shadow:none;background:transparent;';
     document.body.appendChild(ta);
     ta.focus();
     ta.select();
-    const ok = document.execCommand('copy');
+    copied = document.execCommand('copy');
     document.body.removeChild(ta);
-    return ok;
-  } catch(e) {
-    return false;
+  } catch(e) { copied = false; }
+
+  if (copied) {
+    addRecent(text);
+    flashItem(text);
+    showToast('✓ Copied');
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => { addRecent(text); flashItem(text); showToast('✓ Copied'); })
+      .catch(() => openPopup(text));
+  } else {
+    openPopup(text);
   }
 }
 
